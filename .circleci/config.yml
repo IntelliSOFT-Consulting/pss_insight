@@ -40,16 +40,16 @@ deploy:
           sshpass -p Sc281-6736/2014 ssh dnjau@172.104.91.116 'docker stop dhis_pss_international && docker rm dhis_pss_international && docker pull dnjau/dhis_pss:v3 && docker run -d -p 7007:7007 --name dhis_pss_international dnjau/dhis_pss:v3 && 6'
 
 workflows:
-  version: 2
-  build_and_push:
-      jobs:
-      - build_international_instance
-      - deploy:
-          requires:
+    version: 2
+    build_and_push:
+        jobs:
+        - build_international_instance
+        - deploy:
+            requires:
             - build_international_instance
-          filters:
-            branches:
-              only: main
+            filters:
+              branches:
+                only: main
 
 
 
