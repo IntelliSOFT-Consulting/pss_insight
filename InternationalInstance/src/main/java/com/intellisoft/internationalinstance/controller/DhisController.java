@@ -24,10 +24,7 @@ public class DhisController {
 
         Results results = programsService.programList();
         return formatterClass.getResponse(results);
-//https://github.com/IntelliSOFT-Consulting/pss_insight
 
     }
 }
-
-//    git remote add origin https://github.com/IntelliSOFT-Consulting/pss_insight
 
