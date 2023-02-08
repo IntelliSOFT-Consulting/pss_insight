@@ -41,7 +41,7 @@ deploy_services:
 
 workflows:
   version: 2
-  build_and_push:
+  deploy_services:
     jobs:
       - build_international_instance
       - deploy:
