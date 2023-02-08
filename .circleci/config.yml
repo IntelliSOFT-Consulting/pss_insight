@@ -28,7 +28,7 @@ jobs:
                   docker push dnjau/dhis_pss:v3
                   docker logout
 
-deploy_services:
+deploy:
   machine:
     image: ubuntu-2004:202010-01
   steps:
@@ -41,7 +41,7 @@ deploy_services:
 
 workflows:
   version: 2
-  deploy_services:
+  build_and_push:
     jobs:
       - build_international_instance
       - deploy:
