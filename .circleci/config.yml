@@ -28,16 +28,16 @@ jobs:
                   docker push dnjau/dhis_pss:v3
                   docker logout
 
-deploy:
-  machine:
-    image: ubuntu-2004:202010-01
-  steps:
-    - run: sudo apt install rsync
-    - run: sudo apt-get install sshpass
-    - run:
-        name: SSH into remote server and deploy auth service
-        command: |
-          sshpass -p Sc281-6736/2014 ssh dnjau@172.104.91.116 'docker stop dhis_pss_international && docker rm dhis_pss_international && docker pull dnjau/dhis_pss:v3 && docker run -d -p 7007:7007 --name dhis_pss_international dnjau/dhis_pss:v3 && 6'
+  deploy:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - run: sudo apt install rsync
+      - run: sudo apt-get install sshpass
+      - run:
+          name: SSH into remote server and deploy auth service
+          command: |
+            sshpass -p Sc281-6736/2014 ssh dnjau@172.104.91.116 'docker stop dhis_pss_international && docker rm dhis_pss_international && docker pull dnjau/dhis_pss:v3 && docker run -d -p 7007:7007 --name dhis_pss_international dnjau/dhis_pss:v3 && 6'
 
 workflows:
     version: 2
