@@ -11,6 +11,10 @@ data class DbResults(
 
 data class DbError(val details: Any?)
 
+data class DbMetadataJson(
+    @JsonProperty("programs")
+    val programs: List<DbPrograms>
+)
 
 data class DbProgramsList(
     @JsonProperty("programs")
@@ -29,9 +33,9 @@ data class DbTemplate(
     @JsonProperty("description")
     val description: String?,
     @JsonProperty("program")
-    val program: String?
-//    @JsonProperty("metadata")
-//    val metadata: String
+    val program: String?,
+    @JsonProperty("metadata")
+    val metadata: Any?
 )
 
 data class DbTemplateData(
@@ -39,5 +43,8 @@ data class DbTemplateData(
     val description: String?,
     val program: String?
 )
-
+data class DbSaveTemplate(
+    @JsonProperty("httpStatusCode")
+    val httpStatusCode: Int?,
+)
 

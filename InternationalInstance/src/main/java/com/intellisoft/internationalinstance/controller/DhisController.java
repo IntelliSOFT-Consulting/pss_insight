@@ -1,5 +1,6 @@
 package com.intellisoft.internationalinstance.controller;
 
+import com.intellisoft.internationalinstance.DbTemplateData;
 import com.intellisoft.internationalinstance.FormatterClass;
 import com.intellisoft.internationalinstance.Results;
 import com.intellisoft.internationalinstance.service_impl.ProgramsService;
@@ -54,6 +55,14 @@ public class DhisController {
         }
 
         Results results = programsService.getTemplates(limitNo);
+        return formatterClass.getResponse(results);
+
+    }
+    @PostMapping("/save-template")
+    public ResponseEntity<?> saveTemplate(
+            @RequestBody DbTemplateData dbTemplateData) {
+
+        Results results = programsService.saveTemplates(dbTemplateData);
         return formatterClass.getResponse(results);
 
     }

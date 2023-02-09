@@ -1,6 +1,8 @@
 package com.intellisoft.internationalinstance.service_impl;
 
 import com.intellisoft.internationalinstance.*;
+import net.minidev.json.JSONObject;
+import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -8,10 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @Service
 public class ProgramsServiceImpl implements ProgramsService{
@@ -170,7 +170,6 @@ public class ProgramsServiceImpl implements ProgramsService{
                                 //Get individual version
                                 String versionValue = versionValuesList.get(j);
                                 String templateUrl = dataStoreUrl + namespace + "/" + versionValue;
-                                System.out.println(templateUrl);
 
                                 DbTemplate dbTemplate = getTemplateData(templateUrl);
                                 if (dbTemplate != null){
@@ -244,5 +243,56 @@ public class ProgramsServiceImpl implements ProgramsService{
 
 
     }
+
+
+    @Override
+    public Results saveTemplates(DbTemplateData dbTemplateData) {
+
+        Results results;
+
+        String key = dbTemplateData.getVersionNumber();
+        String namespace = dbTemplateData.getProgram();
+        String description = dbTemplateData.getDescription();
+
+        String templateUrl = internationalUrl + dataStore + namespace + "/" + key;
+
+        // Get the metadata json
+        ResponseEntity<JSONObject> metadataJson = restTemplate.exchange(internationalUrl+programsUrl,
+                HttpMethod.GET, getHeaders(), JSONObject.class);
+        if (metadataJson.getStatusCode() == HttpStatus.OK) {
+
+            DbTemplate dbTemplate = new DbTemplate(
+                    description,
+                    namespace,
+                    metadataJson);
+
+            // Create the request headers
+            HttpHeaders headers = new HttpHeaders();
+            String auth = "admin:district";
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+            String authHeader = "Basic " + new String(encodedAuth);
+            headers.add("Authorization", authHeader);
+
+            // Create the request body as a Map
+            HttpEntity<DbTemplate> request = new HttpEntity<>(dbTemplate, headers);
+
+            ResponseEntity<DbSaveTemplate> response = restTemplate.postForEntity(
+                    templateUrl, request, DbSaveTemplate.class);
+
+            if (response.getStatusCodeValue() == 201){
+                results = new Results(201, new DbError("The template has been saved successfully."));
+            }else {
+                results = new Results(400, new DbError("The resource cannot be saved"));
+            }
+
+
+        }else {
+            results = new Results(400, new DbError("There was an issue in processing the request"));
+
+        }
+
+        return results;
+    }
+
 
 }
