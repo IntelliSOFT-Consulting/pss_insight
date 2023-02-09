@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(value = "/api/v1")
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +17,6 @@ public class DhisController {
 
     private final ProgramsService programsService;
 
-    @CrossOrigin(origins = "*")
     @GetMapping(value = "/programs")
     public ResponseEntity<?> getAppointmentTypes(){
 
