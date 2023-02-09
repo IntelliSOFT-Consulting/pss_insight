@@ -5,10 +5,7 @@ import com.intellisoft.internationalinstance.Results;
 import com.intellisoft.internationalinstance.service_impl.ProgramsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping(value = "/api/v1")
 @RestController
@@ -19,6 +16,7 @@ public class DhisController {
 
     private final ProgramsService programsService;
 
+    @CrossOrigin(origins = "*")
     @GetMapping(value = "/programs")
     public ResponseEntity<?> getAppointmentTypes(){
 
