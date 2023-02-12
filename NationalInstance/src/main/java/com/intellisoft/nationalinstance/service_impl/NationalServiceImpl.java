@@ -16,6 +16,11 @@ public class NationalServiceImpl implements NationalService{
 
     @Value("${dhis.international}")
     private String internationalUrl;
+    @Value("${dhis.national}")
+    private String nationalUrl;
+
+    @Value("${dhis.orgUnits}")
+    private String orgUnitsUrl;
 
     @Value("${dhis.datastore}")
     private String dataStore;
@@ -39,8 +44,52 @@ public class NationalServiceImpl implements NationalService{
 
     @Override
     public Results getOrganisationUnits() {
-        return null;
+
+        DbOrganisationUnit dbOrganisationUnit = getOrganisationUnitData();
+        if(dbOrganisationUnit != null){
+
+            List<DbOrgUnits> dbOrgUnitsList = dbOrganisationUnit.getOrganisationUnits();
+
+            DbResults dbResults = new DbResults(
+                    dbOrgUnitsList.size(),
+                    dbOrgUnitsList);
+
+            return new Results(200, dbResults);
+
+        }else {
+            return new Results(400, new DbError("There was an issue getting the org units"));
+        }
     }
+
+    private DbOrganisationUnit getOrganisationUnitData(){
+
+        String orgUrl = nationalUrl + orgUnitsUrl;
+        ResponseEntity<DbOrganisationUnit> response = restTemplate.exchange(orgUrl,
+                HttpMethod.GET, getHeaders(), DbOrganisationUnit.class);
+
+        try{
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // process the response
+                DbOrganisationUnit dbTemplate = response.getBody();
+                if (dbTemplate != null) {
+                    return dbTemplate;
+                }else {
+                    return null;
+                }
+            }else {
+                return null;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+
+
+    }
+
 
     @Override
     public Results getVersions(int limitNo) {

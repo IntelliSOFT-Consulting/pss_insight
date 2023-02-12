@@ -36,3 +36,13 @@ data class DbTemplate(
     @JsonProperty("metadata")
     val metadata: Any?
 )
+data class DbOrganisationUnit(
+    @JsonProperty("organisationUnits")
+    val organisationUnits : List<DbOrgUnits>
+)
+data class DbOrgUnits(
+    @JsonProperty("id")
+    val id: String,
+    @JsonProperty("displayName")
+    val displayName: String
+)
