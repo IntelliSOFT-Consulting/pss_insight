@@ -7,16 +7,19 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="NationalInstance" />
         <module name="InternationalInstance" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="InternationalInstance" target="11" />
+      <module name="NationalInstance" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="InternationalInstance" options="-parameters" />
+      <module name="NationalInstance" options="-parameters" />
     </option>
   </component>
 </project>
