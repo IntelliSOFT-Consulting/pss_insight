@@ -22,6 +22,9 @@ public class ProgramsServiceImpl implements ProgramsService{
     @Value("${dhis.international}")
     private String internationalUrl;
 
+    @Value("${dhis.template}")
+    private String master_template;
+
     @Value("${dhis.username}")
     private String username;
     @Value("${dhis.password}")
@@ -147,61 +150,46 @@ public class ProgramsServiceImpl implements ProgramsService{
         List<DbTemplateData> dbTemplateDataList = new ArrayList<>();
 
         /**
-         * Get namespaces, from individual namespace, get versions under the namespace
+         * Use the one namespace, get versions under the namespace
          * Using THE namespace and THE version, get the datastore and format
          */
-        ResponseEntity<String[]> namespaceDataList = getNamespaceData();
-        if (namespaceDataList.getStatusCode() == HttpStatus.OK) {
-            // process the response
-            String[] nameSpaceList = namespaceDataList.getBody();
-            if (nameSpaceList != null){
-                ArrayList<String> namespaceList = new ArrayList<>(List.of(nameSpaceList));
-                for (int i = 0; i < namespaceList.size(); i++){
-                    // Get individual namespace
-                    String namespace = namespaceList.get(i);
-                    ResponseEntity<String[]> versionList = getVersionsData(namespace);
-                    if (versionList.getStatusCode() == HttpStatus.OK ){
+        ResponseEntity<String[]> versionList = getVersionsData(master_template);
+        if (versionList.getStatusCode() == HttpStatus.OK ){
 
-                        String[] versionDataList = versionList.getBody();
-                        if (versionDataList != null){
+            String[] versionDataList = versionList.getBody();
+            if (versionDataList != null){
 
-                            ArrayList<String> versionValuesList = new ArrayList<>(List.of(versionDataList));
-                            for (int j = 0; j < versionValuesList.size(); j++){
-                                //Get individual version
-                                String versionValue = versionValuesList.get(j);
-                                String templateUrl = dataStoreUrl + namespace + "/" + versionValue;
+                ArrayList<String> versionValuesList = new ArrayList<>(List.of(versionDataList));
+                for (int j = 0; j < versionValuesList.size(); j++){
+                    //Get individual version
+                    String versionValue = versionValuesList.get(j);
+                    String templateUrl = dataStoreUrl + master_template + "/" + versionValue;
 
-                                DbTemplate dbTemplate = getTemplateData(templateUrl);
-                                if (dbTemplate != null){
+                    DbTemplate dbTemplate = getTemplateData(templateUrl);
+                    if (dbTemplate != null){
 
-                                    String description = "";
-                                    String program = "";
+                        String description = "";
+                        String program = "";
 
-                                    if (dbTemplate.getDescription() != null){
-                                        description = dbTemplate.getDescription();
-                                    }
-                                    if (dbTemplate.getProgram() != null){
-                                        program = dbTemplate.getProgram();
-                                    }
-
-                                    DbTemplateData dbTemplateData = new DbTemplateData(
-                                            versionValue,
-                                            description,
-                                            program);
-                                    dbTemplateDataList.add(dbTemplateData);
-                                }
-
-                            }
-
-
+                        if (dbTemplate.getDescription() != null){
+                            description = dbTemplate.getDescription();
+                        }
+                        if (dbTemplate.getProgram() != null){
+                            program = dbTemplate.getProgram();
                         }
 
-
+                        DbTemplateData dbTemplateData = new DbTemplateData(
+                                versionValue,
+                                description,
+                                program);
+                        dbTemplateDataList.add(dbTemplateData);
                     }
 
                 }
 
+
             }
+
 
         }
 
@@ -251,10 +239,10 @@ public class ProgramsServiceImpl implements ProgramsService{
         Results results;
 
         String key = dbTemplateData.getVersionNumber();
-        String namespace = dbTemplateData.getProgram();
+        String program = dbTemplateData.getProgram();
         String description = dbTemplateData.getDescription();
 
-        String templateUrl = internationalUrl + dataStore + namespace + "/" + key;
+        String templateUrl = internationalUrl + dataStore + master_template + "/" + key;
 
         // Get the metadata json
         ResponseEntity<JSONObject> metadataJson = restTemplate.exchange(internationalUrl+programsUrl,
@@ -263,7 +251,7 @@ public class ProgramsServiceImpl implements ProgramsService{
 
             DbTemplate dbTemplate = new DbTemplate(
                     description,
-                    namespace,
+                    program,
                     metadataJson);
 
             // Create the request headers

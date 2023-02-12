@@ -13,7 +13,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="InternationalInstance" target="11" />
-      <module name="NationalInstance" target="17" />
+      <module name="NationalInstance" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
