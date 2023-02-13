@@ -121,7 +121,7 @@ public class NationalServiceImpl implements NationalService{
         if (dbTemplate != null){
             DbMetaData dbMetaData = dbTemplate.getMetadata();
             if (dbMetaData != null){
-                ArrayList<DbDataElementData> dataElementList = dbMetaData.getDataElement();
+                ArrayList<DbDataElementData> dataElementList = dbMetaData.getBody().getDataElements();
                 DbResults dbResults = new DbResults(
                         dataElementList.size(),
                         dataElementList);
@@ -141,6 +141,9 @@ public class NationalServiceImpl implements NationalService{
 
     @Nullable
     private DbTemplate getDbTemplate(String metadataUrl) {
+
+        System.out.println(metadataUrl);
+
         ResponseEntity<DbTemplate> response = restTemplate.exchange(metadataUrl,
                 HttpMethod.GET, getHeaders(), DbTemplate.class);
 
@@ -230,6 +233,7 @@ public class NationalServiceImpl implements NationalService{
 
         Results results;
 
+        // check if the date is correct
         String date = dataEntry.getEventDate();
         boolean isDateValid = formatterClass.isValidDate(date);
 
