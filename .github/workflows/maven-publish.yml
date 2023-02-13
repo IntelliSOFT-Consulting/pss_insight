@@ -37,7 +37,7 @@ jobs:
         cd InternationalInstance
         mvn clean install
 
-    - name: Build & push Docker image
+    - name: Build & push International Docker image
       uses: mr-smithers-excellent/docker-build-push@v5
       env:
         DOCKERFILE_LOCATION: ./InternationalInstance
