@@ -28,7 +28,7 @@ jobs:
                   docker push dnjau/dhis_pss:v3
                   docker logout
 
-  deploy:
+  deploy_international:
     machine:
       image: ubuntu-2004:202010-01
     steps:
@@ -39,17 +39,70 @@ jobs:
           command: |
             sshpass -p Sc281-6736/2014 ssh dnjau@172.104.91.116 'docker stop dhis_pss_international && docker rm dhis_pss_international && docker pull dnjau/dhis_pss:v3 && docker run -d -p 7007:7007 --name dhis_pss_international dnjau/dhis_pss:v3 && sleep 6'
 
+
+
+  build_national_instance:
+    working_directory: ~/PssDhisCustomApp/NationalInstance
+    docker:
+      - image: cimg/openjdk:17.0.1
+
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+      - setup_remote_docker
+      - checkout:
+          path: ~/PssDhisCustomApp
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - run:
+                name: Build with Maven
+                command: mvn install
+            - run:
+                name: Build Docker Image and Push to Docker Hub
+                command: |
+                  docker build -t dnjau/dhis_pss_national:v3 .
+                  echo "Sc281-6736/2014" | docker login -u "dnjau" --password-stdin
+                  docker push dnjau/dhis_pss_national:v3
+                  docker logout
+
+  deploy_national_instance:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - run: sudo apt install rsync
+      - run: sudo apt-get install sshpass
+      - run:
+          name: SSH into remote server and deploy auth service
+          command: |
+            sshpass -p Sc281-6736/2014 ssh dnjau@172.104.91.99 'docker stop dhis_pss_national && docker rm dhis_pss_national && docker pull dnjau/dhis_pss_national:v3 && docker run -d -p 7008:7008 --name dhis_pss_national dnjau/dhis_pss_national:v3 && sleep 6'
+
+
+
+
+
 workflows:
     version: 2
     build_and_push:
         jobs:
         - build_international_instance
-        - deploy:
+        - deploy_international:
             requires:
             - build_international_instance
             filters:
               branches:
                 only: main
+
+        - build_national_instance
+        - deploy_national_instance:
+            requires:
+            - build_national_instance
+            filters:
+              branches:
+                only: main
+
 
 
 
