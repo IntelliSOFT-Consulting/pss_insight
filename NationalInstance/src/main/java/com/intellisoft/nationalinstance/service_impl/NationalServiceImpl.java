@@ -37,6 +37,8 @@ public class NationalServiceImpl implements NationalService{
     @Autowired
     private RestTemplate restTemplate;
 
+    FormatterClass formatterClass = new FormatterClass();
+
     private HttpEntity<String> getHeaders(){
 
 
@@ -226,27 +228,41 @@ public class NationalServiceImpl implements NationalService{
     @Override
     public Results saveVersions(DbDataEntry dataEntry) {
 
-        String saveUrl = nationalUrl + events;
-
-        // Create the request headers
-        HttpHeaders headers = new HttpHeaders();
-        String auth = "admin:district";
-        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
-        String authHeader = "Basic " + new String(encodedAuth);
-        headers.add("Authorization", authHeader);
-
-        // Create the request body as a Map
-        HttpEntity<DbDataEntry> request = new HttpEntity<>(dataEntry, headers);
-
-        ResponseEntity<DbDataEntrySave> response = restTemplate.postForEntity(
-                saveUrl, request, DbDataEntrySave.class);
-
         Results results;
-        if (response.getStatusCodeValue() == 200){
-            results = new Results(201, new DbError("The data has been saved successfully."));
+
+        String date = dataEntry.getEventDate();
+        boolean isDateValid = formatterClass.isValidDate(date);
+
+        if (isDateValid){
+
+            String saveUrl = nationalUrl + events;
+
+            // Create the request headers
+            HttpHeaders headers = new HttpHeaders();
+            String auth = "admin:district";
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
+            String authHeader = "Basic " + new String(encodedAuth);
+            headers.add("Authorization", authHeader);
+
+            // Create the request body as a Map
+            HttpEntity<DbDataEntry> request = new HttpEntity<>(dataEntry, headers);
+
+            ResponseEntity<DbDataEntrySave> response = restTemplate.postForEntity(
+                    saveUrl, request, DbDataEntrySave.class);
+
+            if (response.getStatusCodeValue() == 200){
+                results = new Results(201, new DbError("The data has been saved successfully."));
+            }else {
+                results = new Results(400, new DbError("The resource cannot be saved"));
+            }
+
+
         }else {
-            results = new Results(400, new DbError("The resource cannot be saved"));
+            results = new Results(400, new DbError("Make sure the event date is in the format yyyy-mm-dd"));
+
         }
+
+
         return results;
 
     }

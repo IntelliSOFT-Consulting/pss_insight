@@ -7,6 +7,13 @@ import java.util.regex.Pattern
 
 class FormatterClass {
 
+
+    //Check date format
+    fun isValidDate(date: String): Boolean {
+        val dateRegex = """\d{4}-\d{2}-\d{2}"""
+        return date.matches(Regex(dateRegex))
+    }
+
     //Convert date to string
     fun convertDateToString(date: Date?): String {
 
