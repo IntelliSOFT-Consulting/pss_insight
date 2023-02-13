@@ -41,6 +41,7 @@ jobs:
       uses: mr-smithers-excellent/docker-build-push@v5
       env:
         DOCKERFILE_LOCATION: ./InternationalInstance
+      working-directory: pss_insight
       with:
         image: dnjau/dhis_pss_international
         tags: v3
