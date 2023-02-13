@@ -47,22 +47,30 @@ data class DbOrgUnits(
     val displayName: String
 )
 data class DbMetaData(
-    @JsonProperty("dataElement")
-    val dataElement: ArrayList<DbDataElementData>
+
+    @JsonProperty("body")
+    val body : DbBody
+
 )
+
+data class DbBody(
+    @JsonProperty("dataElements")
+    val dataElements: ArrayList<DbDataElementData>
+)
+
 data class DbDataElementData(
     @JsonProperty("id")
-    val id: String,
+    val id: String?,
     @JsonProperty("code")
-    val code: String,
+    val code: String?,
     @JsonProperty("created")
-    val created: String,
+    val created: String?,
     @JsonProperty("formName")
-    val formName: String,
+    val formName: String?,
     @JsonProperty("valueType")
-    val valueType: String,
+    val valueType: String?,
     @JsonProperty("description")
-    val description: String
+    val description: String?
 )
 data class DbDataEntrySave(
     val httpStatus: String?,
