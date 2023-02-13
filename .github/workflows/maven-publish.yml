@@ -40,7 +40,7 @@ jobs:
     - name: Build Docker image for Microservice 1
       uses: docker/build-push-action@v2
       with:
-        context: microservice_1
+        context: InternationalInstance
         push: true
         tags: dnjau/dhis_pss_international:v1
       env:
