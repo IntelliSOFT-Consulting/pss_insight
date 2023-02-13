@@ -3,7 +3,7 @@ name: Build and Deploy Spring Boot Microservices
 on:
   push:
     branches:
-      - main
+      - development
 
 env:
   DOCKER_USERNAME: dnjau
@@ -24,16 +24,17 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Build jar file for Microservice 1
-      uses: maven-actions/mvn-with-settings@v1
-      with:
-        maven-version: 3.6.3
-        working-directory: InternationalInstance
-        goals: clean install
-        settings-file: pom.xml
+    - name: Build International Instance
+      run: |
+        cd InternationalInstance
+        mvn clean install
 
     - name: Build Docker image for Microservice 1
       uses: docker/build-push-action@v2
