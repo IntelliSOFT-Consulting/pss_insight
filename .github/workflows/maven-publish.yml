@@ -28,7 +28,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: 11
-        distribution: adoptopenjdk
+        distribution: openjdk
     - name: Checkout code
       uses: actions/checkout@v2
 
