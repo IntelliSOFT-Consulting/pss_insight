@@ -34,7 +34,7 @@ data class DbTemplate(
     @JsonProperty("program")
     val program: String?,
     @JsonProperty("metadata")
-    val metadata: Any?
+    val metadata: DbMetaData?
 )
 data class DbOrganisationUnit(
     @JsonProperty("organisationUnits")
@@ -45,4 +45,27 @@ data class DbOrgUnits(
     val id: String,
     @JsonProperty("displayName")
     val displayName: String
+)
+data class DbMetaData(
+    @JsonProperty("dataElement")
+    val dataElement: ArrayList<DbDataElementData>
+)
+data class DbDataElementData(
+    @JsonProperty("id")
+    val id: String,
+    @JsonProperty("code")
+    val code: String,
+    @JsonProperty("created")
+    val created: String,
+    @JsonProperty("formName")
+    val formName: String,
+    @JsonProperty("valueType")
+    val valueType: String,
+    @JsonProperty("description")
+    val description: String
+)
+data class DbDataEntrySave(
+    val httpStatus: String?,
+    val httpStatusCode: Int?,
+    val message: String?
 )

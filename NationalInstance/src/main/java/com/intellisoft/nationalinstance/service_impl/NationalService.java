@@ -19,7 +19,13 @@ public interface NationalService {
     Results getVersions(int limitNo);
 
     /**
+     * Get all data elements related to the version
+     */
+    Results getVersionDataElements(String version);
+
+    /**
      * Save versions to the datastore
+     * We're assuming this backend was deployed on the same server as the DHIS2 National Instance
      * @param dataEntry
      * @return
      */

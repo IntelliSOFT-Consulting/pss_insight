@@ -40,6 +40,18 @@ public class NationalController {
 
     }
 
+    @GetMapping(value = "/data-elements/{version}")
+    public ResponseEntity<?> getVersionsQuestions(
+            @PathVariable("version") String version
+    ){
+
+        Results results = nationalService.getVersionDataElements(version);
+        return formatterClass.getResponse(results);
+
+    }
+
+
+
     @PostMapping("/save-data-entry")
     public ResponseEntity<?> saveDataEntry(
             @RequestBody DbDataEntry dataEntry) {
