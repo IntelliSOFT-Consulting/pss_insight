@@ -6,17 +6,18 @@ on:
       - main
 
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  SSH_KEY_1: ${{ secrets.SSH_KEY_1 }}
-  SSH_HOST_1: <your_first_server_hostname>
-  SSH_USER_1: <your_first_server_username>
-  CONTAINER_NAME_1: <your_first_container_name>
+  DOCKER_USERNAME: dnjau
+  DOCKER_PASSWORD: Sc281-6736/2014
 
-  SSH_KEY_2: ${{ secrets.SSH_KEY_2 }}
-  SSH_HOST_2: <your_second_server_hostname>
-  SSH_USER_2: <your_second_server_username>
-  CONTAINER_NAME_2: <your_second_container_name>
+  SSH_KEY_1: Sc281-6736/2014
+  SSH_HOST_1: 172.104.91.116
+  SSH_USER_1: dnjau
+  CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
+
+#  SSH_KEY_2: ${{ secrets.SSH_KEY_2 }}
+#  SSH_HOST_2: 172.104.91.99
+#  SSH_USER_2: dnjau
+#  CONTAINER_NAME_NATIONAL: dhis_pss_national
 
 jobs:
   build_microservice_1:
@@ -30,44 +31,20 @@ jobs:
       uses: maven-actions/mvn-with-settings@v1
       with:
         maven-version: 3.6.3
-        working-directory: microservice_1
+        working-directory: InternationalInstance
         goals: clean install
-        settings-file: settings.xml
+        settings-file: pom.xml
 
     - name: Build Docker image for Microservice 1
       uses: docker/build-push-action@v2
       with:
         context: microservice_1
         push: true
-        tags: <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
+        tags: dnjau/dhis_pss_international:v1
       env:
         DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
 
-  build_microservice_2:
-    runs-on: ubuntu-20.04
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Build jar file for Microservice 2
-      uses: maven-actions/mvn-with-settings@v1
-      with:
-        maven-version: 3.6.3
-        working-directory: microservice_2
-        goals: clean install
-        settings-file: settings.xml
-
-    - name: Build Docker image for Microservice 2
-      uses: docker/build-push-action@v2
-      with:
-        context: microservice_2
-        push: true
-        tags: <your_dockerhub_username>/microservice_2:${{ env.GITHUB_SHA }}
-      env:
-        DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
 
   deploy_microservice_1:
     runs-on: ubuntu-20.04
@@ -81,8 +58,8 @@ jobs:
         username: ${{ env.SSH_USER_1 }}
         key: ${{ env.SSH_KEY_1 }}
         script: |
-          docker stop ${{ env.CONTAINER_NAME_1 }}
-          docker pull <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
-          docker run -d --name ${{ env.CONTAINER_NAME_1 }} -p 8080:8080 -p 8443:8443 <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
+          docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+          docker pull dnjau/dhis_pss_international:v1
+          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 dnjau/dhis_pss_international:v1
           docker logout
 
