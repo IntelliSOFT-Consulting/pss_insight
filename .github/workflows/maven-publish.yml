@@ -1,0 +1,88 @@
+name: Build and Deploy Spring Boot Microservices
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  SSH_KEY_1: ${{ secrets.SSH_KEY_1 }}
+  SSH_HOST_1: <your_first_server_hostname>
+  SSH_USER_1: <your_first_server_username>
+  CONTAINER_NAME_1: <your_first_container_name>
+
+  SSH_KEY_2: ${{ secrets.SSH_KEY_2 }}
+  SSH_HOST_2: <your_second_server_hostname>
+  SSH_USER_2: <your_second_server_username>
+  CONTAINER_NAME_2: <your_second_container_name>
+
+jobs:
+  build_microservice_1:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build jar file for Microservice 1
+      uses: maven-actions/mvn-with-settings@v1
+      with:
+        maven-version: 3.6.3
+        working-directory: microservice_1
+        goals: clean install
+        settings-file: settings.xml
+
+    - name: Build Docker image for Microservice 1
+      uses: docker/build-push-action@v2
+      with:
+        context: microservice_1
+        push: true
+        tags: <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
+      env:
+        DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
+
+  build_microservice_2:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build jar file for Microservice 2
+      uses: maven-actions/mvn-with-settings@v1
+      with:
+        maven-version: 3.6.3
+        working-directory: microservice_2
+        goals: clean install
+        settings-file: settings.xml
+
+    - name: Build Docker image for Microservice 2
+      uses: docker/build-push-action@v2
+      with:
+        context: microservice_2
+        push: true
+        tags: <your_dockerhub_username>/microservice_2:${{ env.GITHUB_SHA }}
+      env:
+        DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ env.DOCKER_PASSWORD }}
+
+  deploy_microservice_1:
+    runs-on: ubuntu-20.04
+    needs: build_microservice_1
+
+    steps:
+    - name: SSH into server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ env.SSH_HOST_1 }}
+        username: ${{ env.SSH_USER_1 }}
+        key: ${{ env.SSH_KEY_1 }}
+        script: |
+          docker stop ${{ env.CONTAINER_NAME_1 }}
+          docker pull <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
+          docker run -d --name ${{ env.CONTAINER_NAME_1 }} -p 8080:8080 -p 8443:8443 <your_dockerhub_username>/microservice_1:${{ env.GITHUB_SHA }}
+          docker logout
+
