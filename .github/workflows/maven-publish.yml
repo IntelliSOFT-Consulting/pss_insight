@@ -62,7 +62,7 @@ jobs:
         docker pull ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
         while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
-          sleep 1;
+          sleep 10;
         done;
         docker logout
         exit
