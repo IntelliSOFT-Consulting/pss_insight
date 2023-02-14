@@ -37,16 +37,16 @@ jobs:
         cd InternationalInstance
         mvn clean install
 
-    - name: Build & push International Docker image
-      uses: mr-smithers-excellent/docker-build-push@v5
-      working-directory: pss_insight
-      with:
-        image: dnjau/dhis_pss_international
-        tags: v3
-        registry: docker.io
-        dockerfile: Dockerfile
-        username: ${{ env.DOCKER_USERNAME }}
-        password: ${{ env.DOCKER_PASSWORD }}
+#     - name: Build & push International Docker image
+#       uses: mr-smithers-excellent/docker-build-push@v5
+#       working-directory: pss_insight
+#       with:
+#         image: dnjau/dhis_pss_international
+#         tags: v3
+#         registry: docker.io
+#         dockerfile: Dockerfile
+#         username: ${{ env.DOCKER_USERNAME }}
+#         password: ${{ env.DOCKER_PASSWORD }}
 
 
   deploy_microservice_1:
