@@ -43,7 +43,7 @@ jobs:
         cd InternationalInstance
       with:
        image: dnjau/dhis_pss_international
-       tags: v2
+       tags: v3
        registry: docker.io
        username: ${{ env.DOCKER_USERNAME }}
        password: ${{ env.DOCKER_PASSWORD }}
