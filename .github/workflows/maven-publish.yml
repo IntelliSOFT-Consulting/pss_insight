@@ -55,10 +55,13 @@ jobs:
       - name: SSH into server and update container
         run: |
           sshpass -p ${{ env.SSH_PASS }} ssh -o StrictHostKeyChecking=no -l ${{ env.SSH_USER }} ${{ env.SSH_HOST_1 }}
+          echo "Logged in "
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
+            echo "Check 1"
             docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
             docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
           fi
+          echo "Pull start"
           docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
           if [ $? -eq 0 ]; then
             echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
