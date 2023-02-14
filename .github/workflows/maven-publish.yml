@@ -68,7 +68,7 @@ jobs:
           fi
           docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
           while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
-            sleep 10;
+            sleep 30;
           done;
           docker logout
           exit
