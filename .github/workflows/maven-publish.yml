@@ -9,9 +9,9 @@ env:
   DOCKER_USERNAME: dnjau
   DOCKER_PASSWORD: Sc281-6736/2014
 
-  SSH_KEY_1: Sc281-6736/2014
+  SSH_PASS: Sc281-6736/2014
   SSH_HOST_1: 172.104.91.116
-  SSH_USER_1: dnjau
+  SSH_USER: dnjau
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
   IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v1
 
@@ -53,14 +53,11 @@ jobs:
 
     steps:
     - name: SSH into server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.SSH_HOST_1 }}
-        username: ${{ env.SSH_USER_1 }}
-        key: ${{ env.SSH_KEY_1 }}
-        script: |
-          docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
-          docker pull dnjau/dhis_pss_international:v1
-          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 dnjau/dhis_pss_international:v1
-          docker logout
+      run: |
+        sshpass -p ${{ env.SSH_PASS }} ssh -o StrictHostKeyChecking=no -l ${{ env.SSH_USER }} ${{ env.SSH_HOST_1 }}
+        docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+        docker pull ${{ env.IMAGE_NAME_INTERNATIONAL }}
+        docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+        docker logout
+        sleep 6
 
