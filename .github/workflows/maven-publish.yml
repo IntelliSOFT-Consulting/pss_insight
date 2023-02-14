@@ -37,32 +37,31 @@ jobs:
         cd InternationalInstance
         mvn clean install
 
-#     - name: Build & push International Docker image
-#       uses: mr-smithers-excellent/docker-build-push@v5
-#       working-directory: pss_insight
-#       with:
-#         image: dnjau/dhis_pss_international
-#         tags: v3
-#         registry: docker.io
-#         dockerfile: Dockerfile
-#         username: ${{ env.DOCKER_USERNAME }}
-#         password: ${{ env.DOCKER_PASSWORD }}
-
-
-  deploy_microservice_1:
-    runs-on: ubuntu-20.04
-    needs: build_microservice_1
-
-    steps:
-    - name: SSH into server
-      uses: appleboy/ssh-action@master
+    - name: Build & push International Docker image
+      uses: mr-smithers-excellent/docker-build-push@v5
       with:
-        host: ${{ env.SSH_HOST_1 }}
-        username: ${{ env.SSH_USER_1 }}
-        key: ${{ env.SSH_KEY_1 }}
-        script: |
-          docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
-          docker pull dnjau/dhis_pss_international:v1
-          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 dnjau/dhis_pss_international:v1
-          docker logout
+       image: dnjau/dhis_pss_international
+       tags: v2
+       registry: docker.io
+       dockerfile: Dockerfile
+       username: ${{ env.DOCKER_USERNAME }}
+       password: ${{ env.DOCKER_PASSWORD }}
+
+
+#  deploy_microservice_1:
+#    runs-on: ubuntu-20.04
+#    needs: build_microservice_1
+#
+#    steps:
+#    - name: SSH into server
+#      uses: appleboy/ssh-action@master
+#      with:
+#        host: ${{ env.SSH_HOST_1 }}
+#        username: ${{ env.SSH_USER_1 }}
+#        key: ${{ env.SSH_KEY_1 }}
+#        script: |
+#          docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+#          docker pull dnjau/dhis_pss_international:v1
+#          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 dnjau/dhis_pss_international:v1
+#          docker logout
 
