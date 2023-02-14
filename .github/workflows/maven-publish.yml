@@ -42,7 +42,9 @@ jobs:
       run: |
         cd InternationalInstance
         docker buildx build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
+        docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
         docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
+        docker logout
 
 
 #  deploy_microservice_1:
