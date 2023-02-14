@@ -52,12 +52,15 @@ jobs:
     needs: build_microservice_international
 
     steps:
-    - name: SSH into server
+    - name: SSH into server and update container
       run: |
         sshpass -p ${{ env.SSH_PASS }} ssh -o StrictHostKeyChecking=no -l ${{ env.SSH_USER }} ${{ env.SSH_HOST_1 }}
-        docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+        if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
+          docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+          docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+        fi
         docker pull ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker logout
-        sleep 6
+        exit
 
