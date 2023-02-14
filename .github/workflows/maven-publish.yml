@@ -41,7 +41,7 @@ jobs:
     - name: Build & push International Docker image
       run: |
         cd InternationalInstance
-        docker buildx build it ${{ env.IMAGE_NAME_INTERNATIONAL }} .
+        docker buildx build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
 
 
 #  deploy_microservice_1:
