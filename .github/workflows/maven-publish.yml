@@ -61,9 +61,9 @@ jobs:
           fi
           docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
           if [ $? -eq 0 ]; then
-            echo "Docker image ${env.IMAGE_NAME_INTERNATIONAL} pulled successfully"
+            echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
           else
-            echo "Error: Failed to pull Docker image ${env.IMAGE_NAME_INTERNATIONAL}"
+            echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
             exit 1
           fi
           docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
