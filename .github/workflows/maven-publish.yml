@@ -43,7 +43,7 @@ jobs:
        image: dnjau/dhis_pss_international
        tags: v2
        registry: docker.io
-       dockerfile: Dockerfile
+       dockerfile: pss_insight/InternationalInstance/Dockerfile
        username: ${{ env.DOCKER_USERNAME }}
        password: ${{ env.DOCKER_PASSWORD }}
 
