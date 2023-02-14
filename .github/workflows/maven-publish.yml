@@ -13,6 +13,7 @@ env:
   SSH_HOST_1: 172.104.91.116
   SSH_USER_1: dnjau
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
+  IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v1
 
 #  SSH_KEY_2: ${{ secrets.SSH_KEY_2 }}
 #  SSH_HOST_2: 172.104.91.99
@@ -38,15 +39,9 @@ jobs:
         mvn clean install
 
     - name: Build & push International Docker image
-      uses: mr-smithers-excellent/docker-build-push@v5
       run: |
         cd InternationalInstance
-      with:
-       image: dnjau/dhis_pss_international
-       tags: v3
-       registry: docker.io
-       username: ${{ env.DOCKER_USERNAME }}
-       password: ${{ env.DOCKER_PASSWORD }}
+        docker buildx build it ${{ env.IMAGE_NAME_INTERNATIONAL }} .
 
 
 #  deploy_microservice_1:
