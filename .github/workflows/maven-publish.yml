@@ -8,6 +8,7 @@ on:
 env:
   DOCKER_USERNAME: dnjau
   DOCKER_PASSWORD: Sc281-6736/2014
+  SSH_PORT: 22
 
   SSH_PASS: Sc281-6736/2014
   SSH_HOST_1: 172.104.91.116
@@ -46,39 +47,59 @@ jobs:
         docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker logout
 
-
-  deploy_microservice_international:
-    runs-on: ubuntu-20.04
-    needs: build_microservice_international
-
-    steps:
-      - name: SSH into server and update container
-        run: |
-          sshpass -p ${{ env.SSH_PASS }} ssh -o StrictHostKeyChecking=no -l ${{ env.SSH_USER }} ${{ env.SSH_HOST_1 }}
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ env.SSH_HOST_1 }}
+        username: ${{ env.SSH_USER }}
+        password: ${{ env.SSH_PASS }}
+        port: ${{ env.SSH_PORT }}
+        script_stop: true
+        script: |
           echo "Logged in "
+          docker ps
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
             echo "Check 1"
             docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
             docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
           fi
           echo "Pull start"
-          docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          if [ $? -eq 0 ]; then
-            echo "Success pull"
-            echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
-          else
-            echo "Error"
-            echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
-            exit 1
-          fi
-          echo "Before run"
-          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          echo "After run"
-          while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
-            echo "Before sleep"
-            sleep 30;
-          done;
-          docker logout
-          exit
+          docker pull ${{ env.IMAGE_NAME_INTERNATIONAL }}
+          
+
+
+#  deploy_microservice_international:
+#    runs-on: ubuntu-20.04
+#    needs: build_microservice_international
+#
+#    steps:
+#      - name: SSH into server and update container
+#        run: |
+#          sshpass -p ${{ env.SSH_PASS }} ssh -o StrictHostKeyChecking=no -l ${{ env.SSH_USER }} ${{ env.SSH_HOST_1 }}
+#          echo "Logged in "
+#          if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
+#            echo "Check 1"
+#            docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+#            docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+#          fi
+#          echo "Pull start"
+#          docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
+#          if [ $? -eq 0 ]; then
+#            echo "Success pull"
+#            echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
+#          else
+#            echo "Error"
+#            echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
+#            exit 1
+#          fi
+#          echo "Before run"
+#          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+#          echo "After run"
+#          while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
+#            echo "Before sleep"
+#            sleep 30;
+#          done;
+#          docker logout
+#          exit
 
 
