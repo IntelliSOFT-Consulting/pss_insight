@@ -69,10 +69,9 @@ jobs:
             exit 1
           fi
           docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
-            echo "Before sleep"
-#            sleep 30;
-          done;
+          docker logout
+          sleep 10
+          gnome-session-quit --logout
           
 
 
