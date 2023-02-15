@@ -56,15 +56,23 @@ jobs:
         port: ${{ env.SSH_PORT }}
         script_stop: true
         script: |
-          echo "Logged in "
-          docker ps
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
             echo "Check 1"
             docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
             docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
           fi
-          echo "Pull start"
-          docker pull ${{ env.IMAGE_NAME_INTERNATIONAL }}
+          docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
+          if [ $? -eq 0 ]; then
+            echo "Success pull"
+            echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
+          else
+            echo "Error"
+            echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
+            exit 1
+          fi
+          echo "Before run"
+          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+          echo "After run"
           
 
 
