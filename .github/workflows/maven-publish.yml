@@ -63,16 +63,16 @@ jobs:
           fi
           docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
           if [ $? -eq 0 ]; then
-            echo "Success pull"
             echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
           else
-            echo "Error"
             echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
             exit 1
           fi
-          echo "Before run"
           docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          echo "After run"
+          while [ "$(docker inspect -f '{{.State.Running}}' ${{ env.CONTAINER_NAME_INTERNATIONAL }})" != "true" ]; do
+            echo "Before sleep"
+#            sleep 30;
+          done;
           
 
 
