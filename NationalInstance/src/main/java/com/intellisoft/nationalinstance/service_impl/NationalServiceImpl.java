@@ -1,6 +1,7 @@
 package com.intellisoft.nationalinstance.service_impl;
 
 import com.intellisoft.nationalinstance.*;
+import net.minidev.json.JSONObject;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,21 +35,15 @@ public class NationalServiceImpl implements NationalService{
     @Value("${dhis.template}")
     private String master_template;
 
+    @Value("${dhis.programs}")
+    private String programsUrl;
+
     @Autowired
     private RestTemplate restTemplate;
 
     FormatterClass formatterClass = new FormatterClass();
 
-    private HttpEntity<String> getHeaders(){
 
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " +
-                Base64Utils.encodeToString("admin:district".getBytes()));
-
-        return new HttpEntity<>(headers);
-
-    }
 
     @Override
     public Results getOrganisationUnits() {
@@ -73,7 +68,7 @@ public class NationalServiceImpl implements NationalService{
 
         String orgUrl = nationalUrl + orgUnitsUrl;
         ResponseEntity<DbOrganisationUnit> response = restTemplate.exchange(orgUrl,
-                HttpMethod.GET, getHeaders(), DbOrganisationUnit.class);
+                HttpMethod.GET, formatterClass.getHeaders(), DbOrganisationUnit.class);
 
         try{
 
@@ -118,6 +113,7 @@ public class NationalServiceImpl implements NationalService{
     @Override
     public Results getVersionDataElements(String version) {
 
+        Results results;
         String metadataUrl = internationalUrl + dataStore + master_template + "/" + version;
         DbTemplate dbTemplate = getDbTemplate(metadataUrl);
         if (dbTemplate != null){
@@ -127,27 +123,39 @@ public class NationalServiceImpl implements NationalService{
                 DbResults dbResults = new DbResults(
                         dataElementList.size(),
                         dataElementList);
-                return new Results(200, dbResults);
+                results = new Results(200, dbResults);
+
+                //Save the metadata to the National instance data store
+                formatterClass.saveSelectedMetadataToNationalInstance(
+                        internationalUrl,
+                        dataStore,
+                        master_template,
+                        nationalUrl,
+                        version,
+                        restTemplate
+                );
+
             }else {
                 DbResults dbResults = new DbResults(
                         0,
                         new ArrayList<DbDataElementData>());
-                return new Results(200, dbResults);
+                results = new  Results(200, dbResults);
             }
         }else{
-            return new Results(400, new DbError("We could not find the resource"));
+            results = new Results(400, new DbError("We could not find the resource"));
         }
+
+        return results;
     }
+
 
 
 
     @Nullable
     private DbTemplate getDbTemplate(String metadataUrl) {
 
-        System.out.println(metadataUrl);
-
         ResponseEntity<DbTemplate> response = restTemplate.exchange(metadataUrl,
-                HttpMethod.GET, getHeaders(), DbTemplate.class);
+                HttpMethod.GET, formatterClass.getHeaders(), DbTemplate.class);
 
         try{
 
@@ -227,7 +235,7 @@ public class NationalServiceImpl implements NationalService{
 
         String versionUrl = internationalUrl + dataStore + namespace;
         return restTemplate.exchange(versionUrl,
-                HttpMethod.GET, getHeaders(), String[].class);
+                HttpMethod.GET, formatterClass.getHeaders(), String[].class);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.intellisoft.nationalinstance.service_impl;
 
+import com.intellisoft.nationalinstance.DbDataElementsValue;
 import com.intellisoft.nationalinstance.DbDataEntry;
 import com.intellisoft.nationalinstance.Results;
 
@@ -19,7 +20,7 @@ public interface NationalService {
     Results getVersions(int limitNo);
 
     /**
-     * Get all data elements related to the version
+     * Get all data elements related to the version and save them to the National instance
      */
     Results getVersionDataElements(String version);
 

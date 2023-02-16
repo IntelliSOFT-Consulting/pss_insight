@@ -11,6 +11,11 @@ data class DbResults(
 
 data class DbError(val details: Any?)
 
+data class DbDataElementsValue(
+    val description: String?,
+    val program: String?
+)
+
 data class DbDataEntry(
     val program: String,
     val orgUnit: String,
@@ -76,4 +81,16 @@ data class DbDataEntrySave(
     val httpStatus: String?,
     val httpStatusCode: Int?,
     val message: String?
+)
+data class DbAllTemplate(
+    @JsonProperty("description")
+    val description: String?,
+    @JsonProperty("program")
+    val program: String?,
+    @JsonProperty("metadata")
+    val metadata: Any?
+)
+data class DbSaveTemplate(
+    @JsonProperty("httpStatusCode")
+    val httpStatusCode: Int?,
 )

@@ -1,9 +1,9 @@
 name: Build and Deploy Spring Boot Microservices
 
 on:
-  push:
+  merge_request:
     branches:
-      - development
+      - main
 
 env:
   DOCKER_USERNAME: dnjau
