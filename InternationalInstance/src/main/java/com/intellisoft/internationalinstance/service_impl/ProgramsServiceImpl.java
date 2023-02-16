@@ -247,6 +247,7 @@ public class ProgramsServiceImpl implements ProgramsService{
         // Get the metadata json
         ResponseEntity<JSONObject> metadataJson = restTemplate.exchange(internationalUrl+programsUrl,
                 HttpMethod.GET, getHeaders(), JSONObject.class);
+
         if (metadataJson.getStatusCode() == HttpStatus.OK) {
 
             DbTemplate dbTemplate = new DbTemplate(
