@@ -78,8 +78,11 @@ data class DbDataElementData(
     val description: String?
 )
 data class DbDataEntrySave(
+    @JsonProperty("httpStatus")
     val httpStatus: String?,
+    @JsonProperty("httpStatusCode")
     val httpStatusCode: Int?,
+    @JsonProperty("message")
     val message: String?
 )
 data class DbAllTemplate(
