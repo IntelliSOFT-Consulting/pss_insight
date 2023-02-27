@@ -54,7 +54,13 @@ public class MyController {
     public SurveyQuestions showQuestions(@RequestParam Long surveyId) {
         return respondentService.sendVerifiedQuestions(surveyId);
     }
-    @PostMapping("answerSurvey")
+
+    /*
+     This Java code is a method that is used to answer a survey. It takes two parameters, an object containing the answers to
+     the survey and the survey ID, and returns an object containing the questions from the survey. It throws an exception if
+     the URI syntax is incorrect.
+    */
+     @PostMapping("answerSurvey")
     public RespondentQuestions answerSurvey(@RequestBody IncomingAnswers incomingAnswers, @RequestParam Long surveyId) throws URISyntaxException {
         return respondentService.answerSurveyQuestions(incomingAnswers, surveyId);
     }
