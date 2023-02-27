@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Log4j2
@@ -29,8 +30,13 @@ public class VersionServiceImpl implements VersionService {
     private final VersionRepos versionRepos;
     @Override
     public List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException {
-        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
         List<Indicators> indicators = getDataFromRemote();
+        return extractIndicators(indicators);
+    }
+
+    @Override
+    public List<IndicatorForFrontEnd> extractIndicators(List<Indicators> indicators) {
+        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
         indicators.forEach(indicator -> {
             JSONObject jsonObject = new JSONObject(indicator.getMetadata());
             try {
@@ -43,7 +49,6 @@ public class VersionServiceImpl implements VersionService {
             }
 
         });
-
         return indicatorForFrontEnds;
     }
 
@@ -59,9 +64,7 @@ public class VersionServiceImpl implements VersionService {
         }
         if (Boolean.TRUE.equals(version.getIsPublished()))
         {
-            List<String> metaData = indicatorsRepo.findByIndicatorIds(version.getIndicators());
-            System.out.println(metaData.size());
-            System.out.println(metaData);
+            List<String> metaData = indicatorsRepo.findMetadataByIndicatorIds(version.getIndicators());
             if (!metaData.isEmpty()) {
                 JSONObject jsonObject = getRawRemoteData();
                 jsonObject.put("dataElements", new JSONArray(metaData));
@@ -83,8 +86,10 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public Response syncVersion() throws URISyntaxException {
-        var jsonObject = getRawRemoteData();
-        Response response = GenericWebclient.postForSingleObjResponse(AppConstants.DATA_STORE_ENDPOINT, jsonObject, JSONObject.class, Response.class);
+        var jsonObject = GenericWebclient.getForSingleObjResponse(AppConstants.INTERANTIONAL_METADATA_ENDPOINT, String.class);
+
+        // TODO: 27/02/2023 post to national instance
+        Response response = GenericWebclient.postForSingleObjResponse(AppConstants.DATA_STORE_ENDPOINT+ UUID.randomUUID().toString().split("-")[0], new JSONObject(jsonObject), JSONObject.class, Response.class);
         log.info("RESPONSE FROM REMOTE: {}",response.toString());
         if (response.getHttpStatusCode() < 200) {
             throw new CustomException("Unable to create/update record on data store"+response);
@@ -112,6 +117,7 @@ public class VersionServiceImpl implements VersionService {
 
     }
     private JSONObject getRawRemoteData() throws URISyntaxException {
+        //change to national url
         var  res =GenericWebclient.getForSingleObjResponse(AppConstants.INTERANTIONAL_METADATA_ENDPOINT, String.class);
         return new  JSONObject(res);
     }

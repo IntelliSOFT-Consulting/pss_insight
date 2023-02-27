@@ -2,6 +2,8 @@ package com.intellisoft.nationalinstance.db;
 
 import lombok.*;
 
+import javax.persistence.*;
+
 @Entity
 @Table(name = "indicators")
 @Builder@Setter@Getter@AllArgsConstructor@NoArgsConstructor@ToString

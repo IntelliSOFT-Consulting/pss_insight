@@ -66,6 +66,7 @@ public class VersionServiceImpl implements VersionService {
             if (!metaData.isEmpty()) {
                 JSONObject jsonObject = getRawRemoteData();
                 jsonObject.put("dataElements", new JSONArray(metaData));
+                jsonObject.put("version", version.getVersionName());
                 var response = GenericWebclient.postForSingleObjResponse(AppConstants.DATA_STORE_ENDPOINT+version.getVersionName(), jsonObject, JSONObject.class, Response.class);
                 log.info("RESPONSE FROM REMOTE: {}",response.toString());
                 if (response.getHttpStatusCode() < 200) {
@@ -75,7 +76,6 @@ public class VersionServiceImpl implements VersionService {
             else {
                 throw new CustomException("No indicators found for the ids given"+version.getIndicators());
             }
-
 
         }
 

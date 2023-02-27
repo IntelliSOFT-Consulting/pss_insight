@@ -11,5 +11,7 @@ import java.util.List;
 public interface IndicatorsRepo extends CrudRepository<Indicators, Long> {
     List<Indicators> findAll();
     @Query("SELECT i.metadata FROM Indicators i WHERE i.indicatorId in :indicatorIds")
-    List<String> findByIndicatorIds(List<String> indicatorIds);
+    List<String> findMetadataByIndicatorIds(List<String> indicatorIds);
+    @Query("SELECT i FROM Indicators i WHERE i.indicatorId in :indicatorIds")
+    List<Indicators> findIndicatorByIndicatorIds(List<String> indicatorIds);
 }
