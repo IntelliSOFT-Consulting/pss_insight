@@ -24,4 +24,12 @@ public class AnswerServiceImpl implements AnswerService {
         log.info("RES:{}",res);
         return res;
     }
+
+    @Override
+    public String answerQuestions(IncomingAnswers incomingAnswers, Long surveyId) throws URISyntaxException {
+        if (surveyId==null) {
+            throw new IllegalArgumentException("surveyId cannot be null");
+        }
+        return answerQuestions(incomingAnswers);
+    }
 }
