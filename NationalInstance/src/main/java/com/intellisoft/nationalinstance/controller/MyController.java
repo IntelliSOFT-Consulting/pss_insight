@@ -38,10 +38,12 @@ public class MyController {
     public String answer(@RequestBody IncomingAnswers incomingAnswers) throws URISyntaxException {
         return answerService.answerQuestions(incomingAnswers);
     }
-    //this endpoint is used to create the respondent questions both for original request and resend request.
-    // for resend request you just need to adjust the expiry date to a future one and add request param surveyId eg surveyId=1
-    //also for rejected questions- resend using this endpoint .add request parameter earlierRejected=true
-    //NB for rejected questions do not add surveyId as we are going to create a new survey for these.
+    /*
+    -this endpoint is used to create the respondent questions both for original request and resend request.
+    -for resend request you just need to adjust the expiry date to a future one and add request param surveyId eg surveyId=1
+    -also for rejected questions- resend using this endpoint .add request parameter earlierRejected=true
+    -NB for rejected questions do not add surveyId as we are going to create a new survey for these.
+     */
     @PostMapping("createOrUpdateSurvey")
     public RespondentQuestions createOrUpdateSurvey(@RequestBody RespondentIndicators respondentIndicators,@RequestParam Long surveyId,@RequestParam boolean earlierRejected) throws MessagingException {
         return respondentService.sendRespondentQuestions(respondentIndicators,surveyId,earlierRejected);
