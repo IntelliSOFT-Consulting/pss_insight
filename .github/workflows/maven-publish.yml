@@ -6,25 +6,21 @@ on:
       - main
 
 env:
-  DOCKER_USERNAME: dnjau
-  DOCKER_PASSWORD: Sc281-6736/2014
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   SSH_PORT: 22
 
-  SSH_PASS: Sc281-6736/2014
-  SSH_HOST_1: 172.104.91.116
-  SSH_USER: dnjau
+  SSH_PASS: ${{ secrets.SSH_PASS }}
+  SSH_HOST_1: ${{ secrets.SSH_HOST_1 }}
+  SSH_USER: ${{ secrets.SSH_USER }}
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
   IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v1
 
-  SSH_PASS_1: Sc281-6736/2014
-  SSH_HOST_2: 172.104.91.99
+  SSH_PASS_1: ${{ secrets.SSH_PASS_1 }}
+  SSH_HOST_2: ${{ secrets.SSH_HOST_2 }}
   CONTAINER_NAME_NATIONAL: dhis_pss_national
   IMAGE_NAME_NATIONAL: dnjau/dhis_pss_national:v1
 
-#  SSH_KEY_2: ${{ secrets.SSH_KEY_2 }}
-#  SSH_HOST_2: 172.104.91.99
-#  SSH_USER_2: dnjau
-#  CONTAINER_NAME_NATIONAL: dhis_pss_national
 
 jobs:
   build_microservice_international:
