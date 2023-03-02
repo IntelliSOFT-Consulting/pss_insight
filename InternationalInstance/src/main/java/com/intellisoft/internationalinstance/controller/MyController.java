@@ -28,8 +28,9 @@ public class MyController {
      * @throws URISyntaxException
      */
     @GetMapping("/indicators")
-    public List<IndicatorForFrontEnd> getIndicatorForFrontEnd() throws URISyntaxException {
-        return versionService.getIndicators();
+    public ResponseEntity<?> getIndicatorForFrontEnd() throws URISyntaxException {
+        Results results = versionService.getIndicators();
+        return formatterClass.getResponse(results);
     }
 
     /**
@@ -39,7 +40,8 @@ public class MyController {
      * @throws URISyntaxException
      */
     @PostMapping("/version")
-    public VersionEntity createVersion(@RequestBody DbVersionData dbVersionData) throws URISyntaxException {
+    public VersionEntity createVersion(
+            @RequestBody DbVersionData dbVersionData) throws URISyntaxException {
         return versionService.saveDraftOrPublish(dbVersionData);
     }
 

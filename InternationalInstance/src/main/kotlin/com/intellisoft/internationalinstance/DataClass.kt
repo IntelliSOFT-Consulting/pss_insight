@@ -48,7 +48,7 @@ data class DbSaveTemplate(
     val httpStatusCode: Int?,
 )
 data class DbVersionData(
-    val description: String?,
+    val versionDescription: String?,
     val isPublished: Boolean,
     val indicators: List<String>,
 

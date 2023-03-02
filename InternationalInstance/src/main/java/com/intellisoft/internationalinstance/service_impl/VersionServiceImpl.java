@@ -37,28 +37,40 @@ public class VersionServiceImpl implements VersionService {
     private final IndicatorsRepo indicatorsRepo;
     private final VersionRepos versionRepos;
     @Override
-    public List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException {
+    public Results getIndicators() throws URISyntaxException {
 
         /**
          * TODO: Create the groups that will be used for the indicators
          */
 
         List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
-        List<Indicators> indicators = getDataFromRemote();
-        indicators.forEach(indicator -> {
-            JSONObject jsonObject = new JSONObject(indicator.getMetadata());
-            try {
-                String id = jsonObject.getString("id");
-                String code = jsonObject.getString("code");
-                String formName = jsonObject.getString("formName");
-                indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
-            } catch (JSONException e) {
-                log.info(e.getMessage());
-            }
 
-        });
+        try{
 
-        return indicatorForFrontEnds;
+            List<Indicators> indicators = getDataFromRemote();
+            indicators.forEach(indicator -> {
+                JSONObject jsonObject = new JSONObject(indicator.getMetadata());
+                try {
+                    String id = jsonObject.getString("id");
+                    String code = jsonObject.getString("code");
+                    String formName = jsonObject.getString("formName");
+                    indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
+                } catch (JSONException e) {
+                    log.info(e.getMessage());
+                }
+
+            });
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        DbResults dbResults = new DbResults(
+                indicatorForFrontEnds.size(),
+                indicatorForFrontEnds);
+
+        return new Results(200, dbResults);
+
     }
 
     @Override
@@ -66,7 +78,7 @@ public class VersionServiceImpl implements VersionService {
 
         VersionEntity version = new VersionEntity();
 
-        String versionDescription = dbVersionData.getDescription();
+        String versionDescription = dbVersionData.getVersionDescription();
         boolean isPublished = dbVersionData.isPublished();
         List<String> indicatorList = dbVersionData.getIndicators();
 
@@ -78,7 +90,8 @@ public class VersionServiceImpl implements VersionService {
             status = PublishStatus.PUBLISHED.name();
         }
 
-        String versionNo = "0";
+        String versionNo = "1";
+
         if (dbVersionData.getVersionId() != null){
             long versionId = dbVersionData.getVersionId();
             var vs = versionRepos.findById(versionId);
@@ -95,8 +108,12 @@ public class VersionServiceImpl implements VersionService {
 
         }else {
             //Generate new version name
-            long nextId = versionRepos.findLatestId() + 1;
-            versionNo = String.valueOf(nextId);
+            Long currentId = versionRepos.findLatestId();
+            if (currentId != null){
+                long nextId = versionRepos.findLatestId() + 1;
+                versionNo = String.valueOf(nextId);
+            }
+
         }
 
         //Set the version number
@@ -145,13 +162,16 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public Results getTemplates(int page, int size, String status) {
 
-        List<VersionEntity> versionEntityList =
-                getPagedTemplates(
-                        page,
-                        size,
-                        "",
-                        "",
-                        status);
+//        List<VersionEntity> versionEntityList =
+//                getPagedTemplates(
+//                        page,
+//                        size,
+//                        "",
+//                        "",
+//                        status);
+
+        List<VersionEntity> versionEntityList = (List<VersionEntity>) versionRepos.findAll();
+
         DbResults dbResults = new DbResults(
                 versionEntityList.size(),
                 versionEntityList);
@@ -172,7 +192,7 @@ public class VersionServiceImpl implements VersionService {
                     optionalVersionEntity.get().getVersionName() + " has been deleted successfully."
             ));
         }else {
-            results = new Results(400, new DbDetails("The id cannot be found."));
+            results = new Results(400, "The id cannot be found.");
         }
 
 
@@ -194,19 +214,23 @@ public class VersionServiceImpl implements VersionService {
                 versionRepos.findById(versionId);
 
         if (optionalVersionEntity.isPresent()){
-            VersionEntity versionEntity = optionalVersionEntity.get();
 
+            VersionEntity versionEntity = optionalVersionEntity.get();
             List<String> entityIndicators = versionEntity.getIndicators();
+
             List<String> metaDataList = indicatorsRepo.findByIndicatorIds(entityIndicators);
+
             DbIndicatorValues dbIndicatorValues = new DbIndicatorValues(
                     versionEntity.getVersionName(),
                     versionEntity.getVersionDescription(),
                     versionId,
                     versionEntity.getStatus(),
                     metaDataList);
+
             results = new Results(200, dbIndicatorValues);
+
         }else {
-            results = new Results(400, new DbDetails("Version could not be found."));
+            results = new Results(400, "Version could not be found.");
         }
         return results;
     }
@@ -233,13 +257,15 @@ public class VersionServiceImpl implements VersionService {
     }
 
     /**
-     * Get data from MASTER TEMPLATE from DHIS
+     * Get data from MASTER TEMPLATE from DHIS Datastore and save into local db
      * @return
      * @throws URISyntaxException
      */
     private List<Indicators> getDataFromRemote() throws URISyntaxException {
+
         List<Indicators> indicators = new LinkedList<>();
-        var  res =GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_ENDPOINT, String.class);
+        var  res =GenericWebclient.getForSingleObjResponse(
+                AppConstants.METADATA_ENDPOINT, String.class);
 
         JSONObject jsObject = new JSONObject(res);
         JSONArray dataElements = jsObject.getJSONArray("dataElements");

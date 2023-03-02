@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public interface VersionService {
- List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException;
+ Results getIndicators() throws URISyntaxException;
  VersionEntity saveDraftOrPublish(DbVersionData version) throws URISyntaxException;
 
  Results getTemplates(int page, int size, String status);
