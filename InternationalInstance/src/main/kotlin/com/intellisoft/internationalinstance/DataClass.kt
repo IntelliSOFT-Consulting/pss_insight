@@ -9,7 +9,7 @@ data class DbResults(
     val details: Any?
 )
 
-data class DbError(val details: Any?)
+data class DbDetails(val details: Any?)
 
 data class DbMetadataJson(
     @JsonProperty("programs")
@@ -47,4 +47,25 @@ data class DbSaveTemplate(
     @JsonProperty("httpStatusCode")
     val httpStatusCode: Int?,
 )
+data class DbVersionData(
+    val description: String?,
+    val isPublished: Boolean,
+    val indicators: List<String>,
 
+    val createdBy: String?,
+    val publishedBy: String?,
+
+    var versionId: Long?)
+enum class PublishStatus {
+    DRAFT,
+    PUBLISHED
+}
+data class DbIndicatorValues(
+    val versionName:String,
+    val versionDescription:String,
+    val versionId: Long,
+    val status: String,
+    val indicators: List<String>,
+
+
+    )

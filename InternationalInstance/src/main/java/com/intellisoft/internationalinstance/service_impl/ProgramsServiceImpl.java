@@ -65,11 +65,11 @@ public class ProgramsServiceImpl implements ProgramsService{
                         programsList);
                 results = new Results(200, dbResults);
             }else {
-                results = new Results(400, new DbError("No programs could be found"));
+                results = new Results(400, new DbDetails("No programs could be found"));
             }
         } else {
             // handle error
-            results = new Results(400, new DbError("There was an issue getting the programs."));
+            results = new Results(400, new DbDetails("There was an issue getting the programs."));
         }
         return results;
     }
@@ -90,12 +90,12 @@ public class ProgramsServiceImpl implements ProgramsService{
                         list);
                 results = new Results(200, dbResults);
             }else {
-                results = new Results(400, new DbError("No namespaces could be found"));
+                results = new Results(400, new DbDetails("No namespaces could be found"));
             }
 
         } else {
             // handle error
-            results = new Results(400, new DbError("There was an issue getting the namespaces."));
+            results = new Results(400, new DbDetails("There was an issue getting the namespaces."));
         }
         return results;
     }
@@ -125,12 +125,12 @@ public class ProgramsServiceImpl implements ProgramsService{
                         list);
                 results = new Results(200, dbResults);
             }else {
-                results = new Results(400, new DbError("No versions could be found under this namespace"));
+                results = new Results(400, new DbDetails("No versions could be found under this namespace"));
             }
 
         } else {
             // handle error
-            results = new Results(400, new DbError("There was an issue getting the versions."));
+            results = new Results(400, new DbDetails("There was an issue getting the versions."));
         }
         return results;
     }
@@ -269,14 +269,14 @@ public class ProgramsServiceImpl implements ProgramsService{
                     templateUrl, request, DbSaveTemplate.class);
 
             if (response.getStatusCodeValue() == 201){
-                results = new Results(201, new DbError("The template has been saved successfully."));
+                results = new Results(201, new DbDetails("The template has been saved successfully."));
             }else {
-                results = new Results(400, new DbError("The resource cannot be saved"));
+                results = new Results(400, new DbDetails("The resource cannot be saved"));
             }
 
 
         }else {
-            results = new Results(400, new DbError("There was an issue in processing the request"));
+            results = new Results(400, new DbDetails("There was an issue in processing the request"));
 
         }
 

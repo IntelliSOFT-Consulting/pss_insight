@@ -9,7 +9,7 @@ data class DbResults(
     val details: Any?
 )
 
-data class DbError(val details: Any?)
+data class DbDetails(val details: Any?)
 
 data class DbDataElementsValue(
     val description: String?,

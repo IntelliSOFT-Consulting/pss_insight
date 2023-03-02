@@ -89,7 +89,12 @@ public class VersionServiceImpl implements VersionService {
         var jsonObject = GenericWebclient.getForSingleObjResponse(AppConstants.INTERANTIONAL_METADATA_ENDPOINT, String.class);
 
         // TODO: 27/02/2023 post to national instance
-        Response response = GenericWebclient.postForSingleObjResponse(AppConstants.DATA_STORE_ENDPOINT+ UUID.randomUUID().toString().split("-")[0], new JSONObject(jsonObject), JSONObject.class, Response.class);
+        Response response = GenericWebclient.postForSingleObjResponse(
+                AppConstants.DATA_STORE_ENDPOINT+
+                UUID.randomUUID().toString().split("-")[0],
+                new JSONObject(jsonObject), JSONObject.class,
+                Response.class);
+
         log.info("RESPONSE FROM REMOTE: {}",response.toString());
         if (response.getHttpStatusCode() < 200) {
             throw new CustomException("Unable to create/update record on data store"+response);

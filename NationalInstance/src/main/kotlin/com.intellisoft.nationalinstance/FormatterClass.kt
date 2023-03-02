@@ -123,7 +123,7 @@ class FormatterClass {
                 ResponseEntity.internalServerError().body(results)
             }
             else -> {
-                ResponseEntity.badRequest().body(DbError(results.details.toString()))
+                ResponseEntity.badRequest().body(DbDetails(results.details.toString()))
             }
         }
     }

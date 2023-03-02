@@ -20,8 +20,10 @@ public class RespondentQuestions {
     private Long id;
     private String otp;
     private LocalDateTime expiryDate;
-    @Column(length = 8000)
+
     private boolean verified=false;
+
+    @Column(length = 8000)
     private String comments;
     @ElementCollection
     private List<String> indicators;

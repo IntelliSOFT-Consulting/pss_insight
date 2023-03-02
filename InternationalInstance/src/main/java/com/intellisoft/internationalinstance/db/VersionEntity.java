@@ -1,8 +1,11 @@
 package com.intellisoft.internationalinstance.db;
 
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,7 +22,13 @@ public class VersionEntity {
     @Column(unique = true)
     private String versionName;
     private String versionDescription;
-    private Boolean isPublished;
+    private String status;
+    private String createdBy;
+    private String publishedBy;
+    @CreationTimestamp
+    private Date createdAt;
+    @UpdateTimestamp
+    private Date updatedAt;
     @ElementCollection
     private List<String> indicators;
 }

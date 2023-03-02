@@ -60,7 +60,7 @@ public class NationalServiceImpl implements NationalService{
             return new Results(200, dbResults);
 
         }else {
-            return new Results(400, new DbError("There was an issue getting the org units"));
+            return new Results(400, new DbDetails("There was an issue getting the org units"));
         }
     }
 
@@ -142,7 +142,7 @@ public class NationalServiceImpl implements NationalService{
                 results = new  Results(200, dbResults);
             }
         }else{
-            results = new Results(400, new DbError("We could not find the resource"));
+            results = new Results(400, new DbDetails("We could not find the resource"));
         }
 
         return results;
@@ -265,14 +265,14 @@ public class NationalServiceImpl implements NationalService{
                     saveUrl, request, DbDataEntrySave.class);
 
             if (response.getStatusCodeValue() == 200){
-                results = new Results(201, new DbError("The data has been saved successfully."));
+                results = new Results(201, new DbDetails("The data has been saved successfully."));
             }else {
-                results = new Results(400, new DbError("The resource cannot be saved"));
+                results = new Results(400, new DbDetails("The resource cannot be saved"));
             }
 
 
         }else {
-            results = new Results(400, new DbError("Make sure the event date is in the format yyyy-mm-dd"));
+            results = new Results(400, new DbDetails("Make sure the event date is in the format yyyy-mm-dd"));
 
         }
 

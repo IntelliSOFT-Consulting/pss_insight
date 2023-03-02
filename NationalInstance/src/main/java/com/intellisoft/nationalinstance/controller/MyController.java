@@ -7,8 +7,13 @@ import com.intellisoft.nationalinstance.model.*;
 import com.intellisoft.nationalinstance.service_impl.AnswerService;
 import com.intellisoft.nationalinstance.service_impl.RespondentService;
 import com.intellisoft.nationalinstance.service_impl.VersionService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
 
 import javax.mail.MessagingException;
 import java.net.URISyntaxException;
@@ -22,6 +27,16 @@ public class MyController {
     private final VersionService versionService;
     private final RespondentService respondentService;
     private final AnswerService answerService;
+
+    @Operation(
+            summary = "Download a File",
+            description = "Download a file to the server's file system.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "${api.response-codes.ok.desc}"),
+            @ApiResponse(responseCode = "400", description = "${api.response-codes.badRequest.desc}",
+                    content = { @Content(examples = { @ExampleObject(value = "") }) }),
+            @ApiResponse(responseCode = "404", description = "${api.response-codes.notFound.desc}",
+                    content = { @Content(examples = { @ExampleObject(value = "") }) }) })
     @GetMapping("/programs1")
     public List<IndicatorForFrontEnd> getIndicatorForFrontEnd() throws URISyntaxException {
         return versionService.getIndicators();
@@ -40,12 +55,14 @@ public class MyController {
     }
     /*
     -this endpoint is used to create the respondent questions both for original request and resend request.
-    -for resend request you just need to adjust the expiry date to a future one and add request param surveyId eg surveyId=1
-    -also for rejected questions- resend using this endpoint .add request parameter earlierRejected=true
+    -for resend request you just need to adjust the expiry date to a future one and add request param surveyId e.g. surveyId=1
+    -also for rejected questions-resend using this endpoint .add request parameter earlierRejected=true
     -NB for rejected questions do not add surveyId as we are going to create a new survey for these.
      */
     @PostMapping("createOrUpdateSurvey")
-    public RespondentQuestions createOrUpdateSurvey(@RequestBody RespondentIndicators respondentIndicators,@RequestParam Long surveyId,@RequestParam boolean earlierRejected) throws MessagingException {
+    public RespondentQuestions createOrUpdateSurvey(@RequestBody RespondentIndicators respondentIndicators,
+                                                    @RequestParam Long surveyId,
+                                                    @RequestParam boolean earlierRejected) throws MessagingException {
         return respondentService.sendRespondentQuestions(respondentIndicators,surveyId,earlierRejected);
     }
     @PostMapping("verifyRespondent")
