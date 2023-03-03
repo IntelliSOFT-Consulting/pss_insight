@@ -133,6 +133,7 @@ public class VersionServiceImpl implements VersionService {
                 JSONObject jsonObject = getRawRemoteData();
                 jsonObject.put("dataElements", new JSONArray(metaData));
                 jsonObject.put("version", versionNo);
+
                 var response = GenericWebclient.postForSingleObjResponse(
                         AppConstants.DATA_STORE_ENDPOINT+versionNo,
                         jsonObject,

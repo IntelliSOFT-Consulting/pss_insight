@@ -11,24 +11,25 @@ import java.util.List;
 @Data
 @Builder
 @Entity
-@Table(name = "versions")
+@Table(name = "data_entry")
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class VersionEntity {
+public class DataEntry {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
-    private String versionName;
-    private String versionDescription;
-    private String status;
-    private String createdBy;
-    private String publishedBy;
+
+    private String selectedPeriod;
+
+    private String status; // DRAFT / SUBMITTED
+    private String dataEntryPersonId; //The person
+    private String dataEntryDate; // The format is yyyymmdd
     @CreationTimestamp
     private Date createdAt;
     @UpdateTimestamp
     private Date updatedAt;
-    @ElementCollection
-    private List<String> indicators;
+
+
 }

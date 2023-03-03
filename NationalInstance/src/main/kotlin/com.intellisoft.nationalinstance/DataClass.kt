@@ -97,3 +97,39 @@ data class DbSaveTemplate(
     @JsonProperty("httpStatusCode")
     val httpStatusCode: Int?,
 )
+data class DbVersionData(
+    val versionDescription: String?,
+    val isPublished: Boolean,
+    val indicators: List<String>,
+
+    val createdBy: String?,
+    val publishedBy: String?,
+
+    var versionId: Long?)
+enum class PublishStatus {
+    DRAFT,
+    PUBLISHED,
+
+    SUBMITTED,
+
+}
+data class DbIndicatorValues(
+    val versionName:String,
+    val versionDescription:String,
+    val versionId: Long,
+    val status: String,
+    val indicators: List<String>, )
+data class DbDataEntryData(
+    val selectedPeriod: String?,
+    val status: String?,
+    val dataEntryPersonId: String?,
+    val dataEntryDate: String?,
+    val responses: List<DbDataEntryResponses>,
+)
+data class DbDataEntryResponses(
+    val indicator: String,
+    val response: String?,
+    val comment: String?,
+    val attachment: String?
+
+)

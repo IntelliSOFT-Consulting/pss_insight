@@ -6,29 +6,28 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
 @Entity
-@Table(name = "versions")
+@Table(name = "data_entry_response")
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class VersionEntity {
+public class DataEntryResponses {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
-    private String versionName;
-    private String versionDescription;
-    private String status;
-    private String createdBy;
-    private String publishedBy;
+    private Long dataEntryId;
+    private String indicator;
+    private String response;
+    private String comment;
+    private String attachment;
     @CreationTimestamp
     private Date createdAt;
     @UpdateTimestamp
     private Date updatedAt;
-    @ElementCollection
-    private List<String> indicators;
+
+
 }

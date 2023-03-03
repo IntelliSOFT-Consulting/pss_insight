@@ -2,7 +2,6 @@ package com.intellisoft.nationalinstance.controller;
 
 
 import com.intellisoft.nationalinstance.db.RespondentQuestions;
-import com.intellisoft.nationalinstance.db.VersionEntity;
 import com.intellisoft.nationalinstance.model.*;
 import com.intellisoft.nationalinstance.service_impl.AnswerService;
 import com.intellisoft.nationalinstance.service_impl.RespondentService;
@@ -28,27 +27,12 @@ public class MyController {
     private final RespondentService respondentService;
     private final AnswerService answerService;
 
-    @Operation(
-            summary = "Download a File",
-            description = "Download a file to the server's file system.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "${api.response-codes.ok.desc}"),
-            @ApiResponse(responseCode = "400", description = "${api.response-codes.badRequest.desc}",
-                    content = { @Content(examples = { @ExampleObject(value = "") }) }),
-            @ApiResponse(responseCode = "404", description = "${api.response-codes.notFound.desc}",
-                    content = { @Content(examples = { @ExampleObject(value = "") }) }) })
-    @GetMapping("/programs1")
-    public List<IndicatorForFrontEnd> getIndicatorForFrontEnd() throws URISyntaxException {
-        return versionService.getIndicators();
-    }
-    @GetMapping("sync1")
-    public Response sync() throws URISyntaxException {
-        return versionService.syncVersion();
-    }
-    @PostMapping("/create-version1")
-    public VersionEntity createVersion(@RequestBody VersionEntity versionEntity) throws URISyntaxException {
-        return versionService.saveDraftOrPublish(versionEntity);
-    }
+
+//    @GetMapping("/programs1")
+//    public List<IndicatorForFrontEnd> getIndicatorForFrontEnd() throws URISyntaxException {
+//        return versionService.getIndicators();
+//    }
+
     @PostMapping("answer1")
     public String answer(@RequestBody IncomingAnswers incomingAnswers) throws URISyntaxException {
         return answerService.answerQuestions(incomingAnswers);
