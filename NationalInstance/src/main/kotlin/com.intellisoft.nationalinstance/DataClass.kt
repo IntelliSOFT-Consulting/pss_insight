@@ -111,6 +111,12 @@ enum class PublishStatus {
     PUBLISHED,
 
     SUBMITTED,
+    SENT,
+
+    REQUESTED,
+    REJECTED,
+    ACCEPTED,
+    PAST_DUE
 
 }
 data class DbIndicatorValues(
@@ -132,4 +138,36 @@ data class DbDataEntryResponses(
     val comment: String?,
     val attachment: String?
 
+)
+data class DbSurvey(
+    val surveyName: String,
+    val surveyDescription: String,
+    val status: String,
+    val creatorId: String,
+    val indicators : List<String>
+)
+data class DbSurveyRespondent(
+    val emailAddressList: List<String>,
+    val expiryDateTime: String,
+    val surveyId: String,
+    val customAppUrl: String
+)
+data class DbSurveyDetails(
+    val respondentId: String,
+    val password: String
+)
+data class DbResponse(
+    val respondentId: String,
+    val indicator: DbIndicator
+)
+
+data class DbIndicator(
+    val indicatorId: String,
+    val answer: Any,
+    val comments: String?,
+    val attachment: String?
+)
+data class DbRequestLink(
+    val respondentId: String,
+    val comments: String?
 )

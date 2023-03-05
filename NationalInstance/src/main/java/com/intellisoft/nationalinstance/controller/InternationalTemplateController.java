@@ -1,6 +1,9 @@
 package com.intellisoft.nationalinstance.controller;
 
+import com.intellisoft.nationalinstance.FormatterClass;
+import com.intellisoft.nationalinstance.Results;
 import com.intellisoft.nationalinstance.model.Response;
+import com.intellisoft.nationalinstance.service_impl.NationalService;
 import com.intellisoft.nationalinstance.service_impl.VersionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +26,7 @@ import java.net.URISyntaxException;
 public class InternationalTemplateController {
 
     private final VersionService versionService;
+
 
     /**
      * TODO: Pull the international template and add WITH the national template
@@ -45,6 +50,8 @@ public class InternationalTemplateController {
     public Response sync() throws URISyntaxException {
         return versionService.syncVersion();
     }
+
+
 
 
 

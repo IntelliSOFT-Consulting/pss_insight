@@ -64,7 +64,8 @@ public class MyController {
      the URI syntax is incorrect.
     */
      @PostMapping("answerSurvey")
-    public RespondentQuestions answerSurvey(@RequestBody IncomingAnswers incomingAnswers, @RequestParam Long surveyId) throws URISyntaxException {
+    public RespondentQuestions answerSurvey(@RequestBody IncomingAnswers incomingAnswers,
+                                            @RequestParam Long surveyId) throws URISyntaxException {
         return respondentService.answerSurveyQuestions(incomingAnswers, surveyId);
     }
 

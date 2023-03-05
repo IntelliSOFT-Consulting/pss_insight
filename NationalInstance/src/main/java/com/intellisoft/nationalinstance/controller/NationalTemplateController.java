@@ -27,16 +27,7 @@ public class NationalTemplateController {
     private final VersionService versionService;
     FormatterClass formatterClass = new FormatterClass();
 
-    /**
-     * Pull all the indicators from the international data store and display to frontend
-     * @return
-     * @throws URISyntaxException
-     */
-    @GetMapping("/indicators")
-    public ResponseEntity<?> getIndicatorForFrontEnd() throws URISyntaxException {
-        Results results = versionService.getIndicators();
-        return formatterClass.getResponse(results);
-    }
+
 
     /**
      * Save versions to local and Datastore
