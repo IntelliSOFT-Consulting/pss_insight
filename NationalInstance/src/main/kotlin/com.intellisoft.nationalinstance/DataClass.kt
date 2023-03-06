@@ -9,7 +9,7 @@ data class DbResults(
     val details: Any?
 )
 
-data class DbError(val details: Any?)
+data class DbDetails(val details: Any?)
 
 data class DbDataElementsValue(
     val description: String?,
@@ -96,4 +96,78 @@ data class DbAllTemplate(
 data class DbSaveTemplate(
     @JsonProperty("httpStatusCode")
     val httpStatusCode: Int?,
+)
+data class DbVersionData(
+    val versionDescription: String?,
+    val isPublished: Boolean,
+    val indicators: List<String>,
+
+    val createdBy: String?,
+    val publishedBy: String?,
+
+    var versionId: Long?)
+enum class PublishStatus {
+    DRAFT,
+    PUBLISHED,
+
+    SUBMITTED,
+    SENT,
+
+    REQUESTED,
+    REJECTED,
+    ACCEPTED,
+    PAST_DUE
+
+}
+data class DbIndicatorValues(
+    val versionName:String,
+    val versionDescription:String,
+    val versionId: Long,
+    val status: String,
+    val indicators: List<String>, )
+data class DbDataEntryData(
+    val selectedPeriod: String?,
+    val status: String?,
+    val dataEntryPersonId: String?,
+    val dataEntryDate: String?,
+    val responses: List<DbDataEntryResponses>,
+)
+data class DbDataEntryResponses(
+    val indicator: String,
+    val response: String?,
+    val comment: String?,
+    val attachment: String?
+
+)
+data class DbSurvey(
+    val surveyName: String,
+    val surveyDescription: String,
+    val status: String,
+    val creatorId: String,
+    val indicators : List<String>
+)
+data class DbSurveyRespondent(
+    val emailAddressList: List<String>,
+    val expiryDateTime: String,
+    val surveyId: String,
+    val customAppUrl: String
+)
+data class DbSurveyDetails(
+    val respondentId: String,
+    val password: String
+)
+data class DbResponse(
+    val respondentId: String,
+    val indicator: DbIndicator
+)
+
+data class DbIndicator(
+    val indicatorId: String,
+    val answer: String,
+    val comments: String?,
+    val attachment: String?
+)
+data class DbRequestLink(
+    val respondentId: String,
+    val comments: String?
 )

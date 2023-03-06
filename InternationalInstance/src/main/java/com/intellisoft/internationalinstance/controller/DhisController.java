@@ -18,54 +18,54 @@ public class DhisController {
 
     private final ProgramsService programsService;
 
-    @GetMapping(value = "/programs")
-    public ResponseEntity<?> getPrograms(){
-
-        Results results = programsService.programList();
-        return formatterClass.getResponse(results);
-
-    }
-
-    // Get available namespaces
-    @GetMapping(value = "/namespaces")
-    public ResponseEntity<?> getNamespaces(){
-
-        Results results = programsService.getNamespaces();
-        return formatterClass.getResponse(results);
-
-    }
-
-    // Get available versions under a namespace
-    @GetMapping(value = "/versions/{namespace}")
-    public ResponseEntity<?> getVersions(@PathVariable("namespace") String namespace){
-
-        Results results = programsService.getVersions(namespace);
-        return formatterClass.getResponse(results);
-
-    }
+//    @GetMapping(value = "/programs")
+//    public ResponseEntity<?> getPrograms(){
+//
+//        Results results = programsService.programList();
+//        return formatterClass.getResponse(results);
+//
+//    }
+//
+//    // Get available namespaces
+//    @GetMapping(value = "/namespaces")
+//    public ResponseEntity<?> getNamespaces(){
+//
+//        Results results = programsService.getNamespaces();
+//        return formatterClass.getResponse(results);
+//
+//    }
+//
+//    // Get available versions under a namespace
+//    @GetMapping(value = "/versions/{namespace}")
+//    public ResponseEntity<?> getVersions(@PathVariable("namespace") String namespace){
+//
+//        Results results = programsService.getVersions(namespace);
+//        return formatterClass.getResponse(results);
+//
+//    }
     // Get Templates
-    @GetMapping(value = "/master-templates")
-    public ResponseEntity<?> getTemplates(
-            @RequestParam(value = "limit", required = false) String limit
-    ){
-
-        int limitNo = 10;
-        if (limit != null && !limit.equals("")){
-            limitNo = Integer.parseInt(limit);
-        }
-
-        Results results = programsService.getTemplates(limitNo);
-        return formatterClass.getResponse(results);
-
-    }
-    @PostMapping("/save-template")
-    public ResponseEntity<?> saveTemplate(
-            @RequestBody DbTemplateData dbTemplateData) {
-
-        Results results = programsService.saveTemplates(dbTemplateData);
-        return formatterClass.getResponse(results);
-
-    }
+//    @GetMapping(value = "/master-templates")
+//    public ResponseEntity<?> getTemplates(
+//            @RequestParam(value = "limit", required = false) String limit
+//    ){
+//
+//        int limitNo = 10;
+//        if (limit != null && !limit.equals("")){
+//            limitNo = Integer.parseInt(limit);
+//        }
+//
+//        Results results = programsService.getTemplates(limitNo);
+//        return formatterClass.getResponse(results);
+//
+//    }
+//    @PostMapping("/save-template")
+//    public ResponseEntity<?> saveTemplate(
+//            @RequestBody DbTemplateData dbTemplateData) {
+//
+//        Results results = programsService.saveTemplates(dbTemplateData);
+//        return formatterClass.getResponse(results);
+//
+//    }
 
 }
 

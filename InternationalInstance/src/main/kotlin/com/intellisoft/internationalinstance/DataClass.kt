@@ -1,6 +1,8 @@
 package com.intellisoft.internationalinstance
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class Results(val code: Int, val details: Any?)
 
@@ -9,7 +11,7 @@ data class DbResults(
     val details: Any?
 )
 
-data class DbError(val details: Any?)
+data class DbDetails(val details: Any?)
 
 data class DbMetadataJson(
     @JsonProperty("programs")
@@ -47,4 +49,41 @@ data class DbSaveTemplate(
     @JsonProperty("httpStatusCode")
     val httpStatusCode: Int?,
 )
+data class DbVersionData(
+    val versionDescription: String?,
+    val isPublished: Boolean,
+    val indicators: List<String>,
 
+    val createdBy: String?,
+    val publishedBy: String?,
+
+    var versionId: Long?)
+enum class PublishStatus {
+    DRAFT,
+    PUBLISHED
+}
+data class DbIndicatorValues(
+    val versionName:String,
+    val versionDescription:String,
+    val versionId: Long,
+    val status: String,
+    val indicators: Any,
+
+
+    )
+
+data class DbFrontendIndicators(
+    val indicatorId: String,
+    val categoryName: String,
+    val indicatorName: String,
+    val indicators: List<DbIndicators>
+)
+data class DbIndicators(
+    val code: String,
+    val name: String,
+    val id: String
+)
+data class DbFrontendCategoryIndicators(
+    val categoryName: String,
+    val indicators: List<DbFrontendIndicators>
+)

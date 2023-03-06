@@ -8,6 +8,9 @@ import org.springframework.util.Base64Utils
 import org.springframework.web.client.RestTemplate
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
 
@@ -97,21 +100,7 @@ class FormatterClass {
         return pat.matcher(emailAddress).matches()
     }
 
-    fun getOpenMrsDate(time: String): String? {
 
-        return try {
-
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-            val output = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-            val d = sdf.parse(time)
-            output.format(d)
-
-        }catch (e: Exception){
-            null
-        }
-
-
-    }
 
 
     fun getResponse(results: Results): ResponseEntity<*>? {
@@ -123,11 +112,30 @@ class FormatterClass {
                 ResponseEntity.internalServerError().body(results)
             }
             else -> {
-                ResponseEntity.badRequest().body(DbError(results.details.toString()))
+                ResponseEntity.badRequest().body(DbDetails(results.details.toString()))
             }
         }
     }
 
+    fun getOtp():String{
 
+        // Using numeric values
+        val rnd = Random()
+        val number = rnd.nextInt(999999)
 
+        return String.format("%06d", number);
+
+    }
+
+    fun getRemainingTime(targetDateStr: String): Triple<Long, Long, Long>{
+        val targetDate = LocalDateTime.parse(targetDateStr,
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        val now = LocalDateTime.now()
+        val duration = Duration.between(now, targetDate)
+
+        val days = duration.toDays()
+        val hours = duration.toHours() % 24
+        val minutes = duration.toMinutes() % 60
+        return Triple(days, hours, minutes)
+    }
 }

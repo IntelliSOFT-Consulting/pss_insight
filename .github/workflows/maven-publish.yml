@@ -10,13 +10,13 @@ env:
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   SSH_PORT: 22
 
-  SSH_PASS: ${{ secrets.SSH_PASS }}
+  SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST_1: ${{ secrets.SSH_HOST_1 }}
   SSH_USER: ${{ secrets.SSH_USER }}
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
   IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v1
 
-  SSH_PASS_1: ${{ secrets.SSH_PASS_1 }}
+  SSH_PASS_1: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST_2: ${{ secrets.SSH_HOST_2 }}
   CONTAINER_NAME_NATIONAL: dhis_pss_national
   IMAGE_NAME_NATIONAL: dnjau/dhis_pss_national:v1
@@ -53,7 +53,7 @@ jobs:
       with:
         host: ${{ env.SSH_HOST_1 }}
         username: ${{ env.SSH_USER }}
-        password: ${{ env.SSH_PASS }}
+        key: ${{ env.SSH_PASS }}
         port: ${{ env.SSH_PORT }}
         script_stop: true
         script: |
@@ -117,7 +117,7 @@ jobs:
         with:
           host: ${{ env.SSH_HOST_2 }}
           username: ${{ env.SSH_USER }}
-          password: ${{ env.SSH_PASS }}
+          key: ${{ env.SSH_PASS }}
           port: ${{ env.SSH_PORT }}
           script_stop: true
           script: |
