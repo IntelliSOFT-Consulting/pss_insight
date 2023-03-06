@@ -58,6 +58,7 @@ jobs:
 #        chmod 600 ~/.ssh/id_rsa
 #        eval $(ssh-agent)
 #        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
+#
 
 
     - name: Remote ssh to server and update international instance
@@ -67,7 +68,7 @@ jobs:
         username: ${{ env.SSH_USER_INTERNATIONAL }}
         port: ${{ env.SSH_PORT }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script_stop: true
+        script_stop: true 
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
             echo "Check 1"
