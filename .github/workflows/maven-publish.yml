@@ -52,6 +52,7 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
 
     - name: Remote ssh to server and update National instance
       uses: appleboy/ssh-action@master
@@ -59,7 +60,7 @@ jobs:
         host: ${{ env.SSH_HOST_2 }}
         username: ${{ env.SSH_USER }}
         port: ${{ env.SSH_PORT }}
-        key: ${{ env.HOME }}/.ssh/id_rsa
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script_stop: true
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
@@ -121,6 +122,7 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
 
       - name: Remote ssh to server and update National instance
         uses: appleboy/ssh-action@master
@@ -128,7 +130,7 @@ jobs:
           host: ${{ env.SSH_HOST_2 }}
           username: ${{ env.SSH_USER }}
           port: ${{ env.SSH_PORT }}
-          key: ~/.ssh/id_rsa
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script_stop: true
           script: |
             if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_NATIONAL }}; then
