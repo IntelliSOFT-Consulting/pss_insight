@@ -66,6 +66,7 @@ jobs:
         host: ${{ env.SSH_HOST_INTERNATIONAL }}
         username: ${{ env.SSH_USER_INTERNATIONAL }}
         port: ${{ env.SSH_PORT }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: true
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
