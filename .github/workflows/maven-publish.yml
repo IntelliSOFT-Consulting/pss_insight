@@ -14,7 +14,7 @@ env:
   SSH_HOST_1: ${{ secrets.SSH_HOST_1 }}
   SSH_USER: ${{ secrets.SSH_USER }}
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
-  IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v1
+  IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v2
 
   SSH_PASS_1: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST_2: ${{ secrets.SSH_HOST_2 }}
