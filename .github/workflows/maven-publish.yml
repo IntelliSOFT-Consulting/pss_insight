@@ -10,9 +10,9 @@ env:
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   SSH_PORT: 22
 
-  SSH_PASS: ${{ secrets.SSH_PRIVATE_KEY }}
-  SSH_HOST_1: ${{ secrets.SSH_HOST_1 }}
-  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_PASS_INTERNATIONAL: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_HOST_INTERNATIONAL: ${{ secrets.SSH_HOST_INTERNATIONAL }}
+  SSH_USER_INTERNATIONAL: ${{ secrets.SSH_USER_INTERNATIONAL }}
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
   IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v2
 
@@ -60,11 +60,11 @@ jobs:
 #        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
 
 
-    - name: Remote ssh to server and update National instance
+    - name: Remote ssh to server and update international instance
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ env.SSH_HOST_2 }}
-        username: ${{ env.SSH_USER }}
+        host: ${{ env.SSH_HOST_INTERNATIONAL }}
+        username: ${{ env.SSH_USER_INTERNATIONAL }}
         port: ${{ env.SSH_PORT }}
         script_stop: true
         script: |
