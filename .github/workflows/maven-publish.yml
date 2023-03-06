@@ -43,10 +43,9 @@ jobs:
     - name: Build & push International Docker image
       run: |
         cd InternationalInstance
-        docker buildx install
-        docker buildx create --name internationalBuilder --platform linux/amd64,linux/arm64,linux/arm/v7
-        docker buildx use internationalBuilder
-        docker buildx build --push ${{ env.IMAGE_NAME_INTERNATIONAL }} .        
+        docker build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
+        docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
+        docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker logout
 
 #    - name: Setup SSH keys
