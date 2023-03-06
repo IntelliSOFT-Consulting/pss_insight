@@ -163,7 +163,7 @@ data class DbResponse(
 
 data class DbIndicator(
     val indicatorId: String,
-    val answer: Any,
+    val answer: String,
     val comments: String?,
     val attachment: String?
 )

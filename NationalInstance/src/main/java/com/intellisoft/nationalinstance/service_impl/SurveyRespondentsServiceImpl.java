@@ -171,7 +171,7 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
 
         String respondentId = dbResponse.getRespondentId();
         String indicatorId = dbResponse.getIndicator().getIndicatorId();
-        Object answer = dbResponse.getIndicator().getAnswer();
+        String answer = dbResponse.getIndicator().getAnswer();
         String comments = dbResponse.getIndicator().getComments();
         String attachment = dbResponse.getIndicator().getAttachment();
 

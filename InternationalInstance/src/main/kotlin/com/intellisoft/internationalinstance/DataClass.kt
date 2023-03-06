@@ -1,6 +1,8 @@
 package com.intellisoft.internationalinstance
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.json.JSONArray
+import org.json.JSONObject
 
 data class Results(val code: Int, val details: Any?)
 
@@ -69,3 +71,18 @@ data class DbIndicatorValues(
 
 
     )
+
+data class DbFrontendIndicators(
+    val categoryName: String,
+    val indicatorName: String,
+    val indicators: List<DbIndicators>
+)
+data class DbIndicators(
+    val code: String,
+    val name: String,
+    val id: String
+)
+data class DbFrontendCategoryIndicators(
+    val categoryName: String,
+    val indicators: List<DbFrontendIndicators>
+)

@@ -66,6 +66,20 @@ public class SurveyRespondentsController {
         return formatterClass.getResponse(results);
 
     }
+    @PostMapping("/response/save")
+    public ResponseEntity<?> saveResponse(
+            @RequestBody DbResponse dbResponse){
+        Results results = surveyRespondentsService
+                .saveResponse(dbResponse);
+        return formatterClass.getResponse(results);
+    }
+    @PostMapping("/response/request-link")
+    public ResponseEntity<?> requestLink(
+            @RequestBody DbRequestLink dbRequestLink){
+        Results results = surveyRespondentsService
+                .requestLink(dbRequestLink);
+        return formatterClass.getResponse(results);
+    }
 
 //    @PutMapping(value = "/{surveyId}")
 //    public VersionEntity updateVersions(

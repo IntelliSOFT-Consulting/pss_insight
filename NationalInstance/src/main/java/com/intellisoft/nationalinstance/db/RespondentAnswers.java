@@ -14,7 +14,7 @@ public class RespondentAnswers {
 
     private String indicatorId;
 
-    private Object answer;
+    private String answer;
 
     private String comments;
 
@@ -24,7 +24,7 @@ public class RespondentAnswers {
     }
 
     public RespondentAnswers(String respondentId, String indicatorId,
-                             Object answer, String comments,
+                             String answer, String comments,
                              String attachment) {
         this.respondentId = respondentId;
         this.indicatorId = indicatorId;
@@ -61,7 +61,7 @@ public class RespondentAnswers {
         return answer;
     }
 
-    public void setAnswer(Object answer) {
+    public void setAnswer(String answer) {
         this.answer = answer;
     }
 
