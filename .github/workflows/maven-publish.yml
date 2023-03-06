@@ -59,7 +59,7 @@ jobs:
         host: ${{ env.SSH_HOST_2 }}
         username: ${{ env.SSH_USER }}
         port: ${{ env.SSH_PORT }}
-        key: ~/.ssh/id_rsa
+        key: ${{ env.HOME }}/.ssh/id_rsa
         script_stop: true
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
