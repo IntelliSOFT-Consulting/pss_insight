@@ -67,12 +67,13 @@ data class DbIndicatorValues(
     val versionDescription:String,
     val versionId: Long,
     val status: String,
-    val indicators: List<String>,
+    val indicators: Any,
 
 
     )
 
 data class DbFrontendIndicators(
+    val indicatorId: String,
     val categoryName: String,
     val indicatorName: String,
     val indicators: List<DbIndicators>

@@ -53,30 +53,7 @@ public class VersionServiceImpl implements VersionService {
             indicators.forEach(indicator -> {
                 JSONObject jsonObject = new JSONObject(indicator.getMetadata());
                 try {
-                    String id = jsonObject.getString("id");
-                    String name  = jsonObject.getString("name");
-                    JSONArray dataElements = jsonObject.getJSONArray("dataElements");
-
-                    String indicatorName = formatterClass.getIndicatorName(name);
-                    String categoryName = formatterClass.mapIndicatorNameToCategory(name);
-
-                    List<DbIndicators> dbIndicatorsList = new ArrayList<>();
-
-                    for(int i = 0; i < dataElements.length(); i++){
-                        JSONObject jsonObject1 = dataElements.getJSONObject(i);
-                        String code = jsonObject1.getString("code");
-                        String formName = jsonObject1.getString("name");
-                        String formId = jsonObject1.getString("id");
-
-                        DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
-                        dbIndicatorsList.add(dbIndicators);
-                    }
-
-                    DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
-                            categoryName,
-                            indicatorName,
-                            dbIndicatorsList);
-                    indicatorForFrontEnds.add(dbFrontendIndicators);
+                    getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
 
 //                    String code = jsonObject.getString("code");
 //                    String formName = jsonObject.getString("formName");
@@ -254,16 +231,11 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public Results getVersion(long versionId) {
 
-        /**
-         * TODO: Check on the 2 tier groupings
-         * Categories and the Indicator names
-         *
-         */
-
         Results results;
 
         Optional<VersionEntity> optionalVersionEntity =
                 versionRepos.findById(versionId);
+        List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         if (optionalVersionEntity.isPresent()){
 
@@ -272,12 +244,49 @@ public class VersionServiceImpl implements VersionService {
 
             List<String> metaDataList = indicatorsRepo.findByIndicatorIds(entityIndicators);
 
+
+            try {
+
+                for(int j = 0; j < metaDataList.size(); j++){
+                    String s = metaDataList.get(j);
+                    JSONObject jsonObject = new JSONObject(s);
+                    getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
+                }
+
+
+
+
+            } catch (JSONException e) {
+                System.out.println("*****1");
+                e.printStackTrace();
+            }
+
+            // Create a map to group the indicators by category name
+            Map<String, List<DbFrontendIndicators>> groupedByCategory = new HashMap<>();
+            for (DbFrontendIndicators indicator : indicatorForFrontEnds) {
+                String categoryName = indicator.getCategoryName();
+                if (!groupedByCategory.containsKey(categoryName)) {
+                    groupedByCategory.put(categoryName, new LinkedList<>());
+                }
+                groupedByCategory.get(categoryName).add(indicator);
+            }
+
+            // Create a new list of DbFrontendCategoryIndicators
+            List<DbFrontendCategoryIndicators> categoryIndicatorsList = new LinkedList<>();
+            for (String categoryName : groupedByCategory.keySet()) {
+                List<DbFrontendIndicators> categoryIndicators = groupedByCategory.get(categoryName);
+
+                DbFrontendCategoryIndicators category = new DbFrontendCategoryIndicators(categoryName, categoryIndicators);
+                categoryIndicatorsList.add(category);
+            }
+
+
             DbIndicatorValues dbIndicatorValues = new DbIndicatorValues(
                     versionEntity.getVersionName(),
                     versionEntity.getVersionDescription(),
                     versionId,
                     versionEntity.getStatus(),
-                    metaDataList);
+                    categoryIndicatorsList);
 
             results = new Results(200, dbIndicatorValues);
 
@@ -285,6 +294,34 @@ public class VersionServiceImpl implements VersionService {
             results = new Results(400, "Version could not be found.");
         }
         return results;
+    }
+
+    private void getIndicatorGroupings(List<DbFrontendIndicators> indicatorForFrontEnds, JSONObject jsonObject) {
+        String indicatorId = jsonObject.getString("id");
+        String name  = jsonObject.getString("name");
+        JSONArray dataElements = jsonObject.getJSONArray("dataElements");
+
+        String indicatorName = formatterClass.getIndicatorName(name);
+        String categoryName = formatterClass.mapIndicatorNameToCategory(name);
+
+        List<DbIndicators> dbIndicatorsList = new ArrayList<>();
+
+        for(int i = 0; i < dataElements.length(); i++){
+            JSONObject jsonObject1 = dataElements.getJSONObject(i);
+            String code = jsonObject1.getString("code");
+            String formName = jsonObject1.getString("name");
+            String formId = jsonObject1.getString("id");
+
+            DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
+            dbIndicatorsList.add(dbIndicators);
+        }
+
+        DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
+                indicatorId,
+                categoryName,
+                indicatorName,
+                dbIndicatorsList);
+        indicatorForFrontEnds.add(dbFrontendIndicators);
     }
 
     private List<VersionEntity> getPagedTemplates(
