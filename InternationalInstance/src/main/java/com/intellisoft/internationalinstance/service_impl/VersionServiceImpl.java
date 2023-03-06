@@ -244,7 +244,6 @@ public class VersionServiceImpl implements VersionService {
 
             List<String> metaDataList = indicatorsRepo.findByIndicatorIds(entityIndicators);
 
-
             try {
 
                 for(int j = 0; j < metaDataList.size(); j++){
@@ -252,9 +251,6 @@ public class VersionServiceImpl implements VersionService {
                     JSONObject jsonObject = new JSONObject(s);
                     getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
                 }
-
-
-
 
             } catch (JSONException e) {
                 System.out.println("*****1");
