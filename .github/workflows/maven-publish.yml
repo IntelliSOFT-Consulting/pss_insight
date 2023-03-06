@@ -48,12 +48,16 @@ jobs:
         docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
         docker logout
 
-    - name: Remote ssh to server and update International instance
+    - name: Setup SSH keys
+      uses: webfactory/ssh-agent@v0.5.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Remote ssh to server and update National instance
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ env.SSH_HOST_1 }}
+        host: ${{ env.SSH_HOST_2 }}
         username: ${{ env.SSH_USER }}
-        key: ${{ env.SSH_PASS }}
         port: ${{ env.SSH_PORT }}
         script_stop: true
         script: |
@@ -111,13 +115,17 @@ jobs:
           docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
           docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
           docker logout
+          
+      - name: Setup SSH keys
+        uses: webfactory/ssh-agent@v0.5.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Remote ssh to server and update National instance
         uses: appleboy/ssh-action@master
         with:
           host: ${{ env.SSH_HOST_2 }}
           username: ${{ env.SSH_USER }}
-          key: ${{ env.SSH_PASS }}
           port: ${{ env.SSH_PORT }}
           script_stop: true
           script: |
