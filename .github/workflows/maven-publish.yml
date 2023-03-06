@@ -59,6 +59,7 @@ jobs:
         host: ${{ env.SSH_HOST_2 }}
         username: ${{ env.SSH_USER }}
         port: ${{ env.SSH_PORT }}
+        key: ~/.ssh/id_rsa
         script_stop: true
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
@@ -73,7 +74,7 @@ jobs:
             echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
             exit 1
           fi
-          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7007:7007 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7009:7009 ${{ env.IMAGE_NAME_INTERNATIONAL }}
           docker logout
           sleep 10
           
@@ -127,6 +128,7 @@ jobs:
           host: ${{ env.SSH_HOST_2 }}
           username: ${{ env.SSH_USER }}
           port: ${{ env.SSH_PORT }}
+          key: ~/.ssh/id_rsa
           script_stop: true
           script: |
             if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_NATIONAL }}; then
