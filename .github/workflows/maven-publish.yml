@@ -49,10 +49,12 @@ jobs:
         docker logout
 
     - name: Setup SSH keys
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        ssh-auth-sock: ${{ env.SSH_AUTH_SOCK }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        eval $(ssh-agent)
+        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
 
 
     - name: Remote ssh to server and update National instance
@@ -61,7 +63,6 @@ jobs:
         host: ${{ env.SSH_HOST_2 }}
         username: ${{ env.SSH_USER }}
         port: ${{ env.SSH_PORT }}
-        key: ${{ env.SSH_AUTH_SOCK }}
         script_stop: true
         script: |
           if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
