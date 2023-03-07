@@ -1,11 +1,6 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.intellisoft.internationalinstance.DbDetails;
-import com.intellisoft.internationalinstance.DbResults;
-import com.intellisoft.nationalinstance.DbDataEntryData;
-import com.intellisoft.nationalinstance.DbDataEntryResponses;
-import com.intellisoft.nationalinstance.FormatterClass;
-import com.intellisoft.nationalinstance.Results;
+import com.intellisoft.nationalinstance.*;
 import com.intellisoft.nationalinstance.db.DataEntry;
 import com.intellisoft.nationalinstance.db.DataEntryResponses;
 import com.intellisoft.nationalinstance.db.repso.DataEntryRepo;

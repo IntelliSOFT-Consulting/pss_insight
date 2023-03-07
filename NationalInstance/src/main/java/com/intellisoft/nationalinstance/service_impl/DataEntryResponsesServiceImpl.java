@@ -1,7 +1,7 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.intellisoft.internationalinstance.DbDetails;
 import com.intellisoft.nationalinstance.DbDataEntryResponses;
+import com.intellisoft.nationalinstance.DbDetails;
 import com.intellisoft.nationalinstance.Results;
 import com.intellisoft.nationalinstance.db.DataEntryResponses;
 import com.intellisoft.nationalinstance.db.repso.DataEntryResponsesRepo;
