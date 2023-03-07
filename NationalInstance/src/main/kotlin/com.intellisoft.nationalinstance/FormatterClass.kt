@@ -16,6 +16,168 @@ import java.util.regex.Pattern
 
 class FormatterClass {
 
+    fun getIndicatorName(indicatorName: String): String{
+
+        var name = ""
+        when (indicatorName) {
+            "PS01" -> {
+                name = "Existence of a national essential medicines list published within the past five years"
+            }
+            "PS02" -> {
+                name = "Existence of a reimbursement list published within the past two years"
+            }
+            "PS03" -> {
+                name = "% of median international price paid for a set of tracer medicines that was part of the last regular MOH procurement"
+            }
+            "PS04" -> {
+                name = "Mean % availability across a basket of medicines"
+            }
+            "PS05" -> {
+                name = "Product losses by value due to expired medicines or damage or theft per value received (%)"
+            }
+            "PS06" -> {
+                name = "% Generic medicines out of total market volume"
+            }
+            "PS07" -> {
+                name = "Defined daily dose (DDD) for antimicrobials (per 1000 population)"
+            }
+            "PS08" -> {
+                name = "% Medicines prescribed from an EML or reimbursement list"
+            }
+            "PS09" -> {
+                name = "% Medicines prescribed as generics"
+            }
+            "PS10" -> {
+                name = "% Antibiotics prescribed in outpatient settings"
+            }
+            "PS11" -> {
+                name = "% Population with unmet medicine needs"
+            }
+
+            "PLG01" -> {
+                name = "An institutional development plan of the national medicines regulatory authority based on the results of the GBT exists"
+            }
+            "PLG02" -> {
+                name = "A progress report on the institutional development of the national medicines regulatory authority published"
+            }
+            "PLG03" -> {
+                name = "Submission of national data to the Global Antimicrobial Resistance Surveillance System (GLASS)"
+            }
+            "PLG04" -> {
+                name = "Updated National Action Plan on the containment of antimicrobial resistance"
+            }
+            "PLG05" -> {
+                name = "# of annual reports submitted to the INCB in last five years"
+            }
+            "PLG06" -> {
+                name = "Pharmaceutical System Transparency and Accountability (PSTA) assessment score"
+            }
+            "PLG07" -> {
+                name = "Number of PSTA assessments within the last five years"
+            }
+
+            "RS01" -> {
+                name = "% of manufacturing facilities inspected each year"
+            }
+            "RS02" -> {
+                name = "% of distribution facilities inspected each year"
+            }
+            "RS03" -> {
+                name = "% of dispensing facilities inspected each year"
+            }
+            "RS04" -> {
+                name = "Average number of days for decision making on a medicine application for registration"
+            }
+            "RS05" -> {
+                name = "% of medicines on the EML that have at least one registered product available."
+            }
+            "RS06" -> {
+                name = "% of recorded adverse event reports that are assessed for causality"
+            }
+            "RS07" -> {
+                name = "% of samples tested that failed quality control testing"
+            }
+
+            "IRDMT01" -> {
+                name = "Pharmaceutical innovation goals identified and documented to address unmet or inadequately met public health needs"
+            }
+            "IRDMT02" -> {
+                name = "Are medicines subject to import tariffs? If so, what are the tariff amounts applied?"
+            }
+            "IRDMT03" ->{
+                name = "Have any of the following TRIPS flexibilities been utilized to date: compulsory licensing provisions, government use, parallel importation provisions, the Bolar exception (10 year time frame)?"
+            }
+
+            "F01" ->{
+                name = "Per capita expenditure on pharmaceuticals"
+            }
+            "F02" ->{
+                name = "Population with household expenditures on health greater than 10% of total household expenditure or income"
+            }
+            "F03" ->{
+                name = "Total expenditure on pharmaceuticals (% total expenditure on health)"
+            }
+            "F04" ->{
+                name = "Median (consumer) drug price ratio for tracer medicines in the public, private, and mission sectors"
+            }
+            "F05" ->{
+                name = "Out-of-pocket expenditure out of total pharmaceutical expenditure"
+            }
+            "F06" ->{
+                name = "At least one national health accounts exercise including pharmaceuticals completed in the past five years. "
+            }
+
+            "HR01" ->{
+                name = "Existence of governing bodies tasked with accreditation of pre- and in-service pharmacy training programs "
+            }
+            "HR02" ->{
+                name = "Population per licensed pharmacist, pharmacy technician, or pharmacy assistant"
+            }
+
+            "IM01" ->{
+                name = "Existence of a policy or strategy that sets standards for collection and management of pharmaceutical information"
+            }
+            "IM02" ->{
+                name = "Data on safety, efficacy, and cost effectiveness of medicines available and used to inform essential medicines selection"
+            }
+
+            "OA01" ->{
+                name = "GBT Maturity Level(s)"
+            }
+            "OA02" ->{
+                name = "MedMon outputs on Affordability and Availablity of pharmaceutical products"
+            }
+            "OA03" ->{
+                name = "Proportion of health facilities that have a core set of relevant essential medicines available and affordable on a sustainable basis. (SDG indicator 3.b.3)"
+            }
+            "OA04" ->{
+                name = "Proportion of population with large household expenditure on health as a share of total household expenditure or income. (SDG indicator 3.8.2)"
+            }
+            "OA05" ->{
+                name = "Coverage of essential health services. (SDG indicator 3.8.1)"
+            }
+
+        }
+        return name
+
+    }
+
+    fun mapIndicatorNameToCategory(indicatorName: String): String {
+        val categoryMap = mapOf(
+            "PS" to "Pharmaceutical Products and Services",
+            "PLG" to "Policy Laws and Governance",
+            "RS" to "Regulatory Systems",
+            "IRDMT" to "Innovation, Research and Development, Manufacturing, and Trade",
+            "F" to "Financing",
+            "HR" to "Human Resources",
+            "IM" to "Information",
+            "OA" to "Outcomes and Attributes"
+        )
+        val prefix = indicatorName.takeWhile { it.isLetter() }
+        return categoryMap[prefix] ?: "Others"
+    }
+
+
 
     fun getHeaders(): HttpEntity<String?>? {
         val headers = HttpHeaders()

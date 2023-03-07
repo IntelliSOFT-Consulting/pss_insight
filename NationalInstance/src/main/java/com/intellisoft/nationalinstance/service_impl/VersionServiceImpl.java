@@ -22,10 +22,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -33,6 +30,8 @@ import java.util.UUID;
 public class VersionServiceImpl implements VersionService {
     private final IndicatorsRepo indicatorsRepo;
     private final VersionRepos versionRepos;
+    private final FormatterClass formatterClass = new FormatterClass();
+
 //    @Override
 //    public List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException {
 //        List<Indicators> indicators = getDataFromRemote();
@@ -224,38 +223,93 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public Results getIndicators() throws URISyntaxException {
 
-        /**
-         * TODO: Create the groups that will be used for the indicators
-         */
 
-        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
+//        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
+        List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         try{
 
-            List<Indicators> indicators = getDataFromRemote();
+            getDataFromRemote();
+            List<Indicators> indicators = indicatorsRepo.findAll();
+
             indicators.forEach(indicator -> {
                 JSONObject jsonObject = new JSONObject(indicator.getMetadata());
                 try {
-                    String id = jsonObject.getString("id");
-                    String code = jsonObject.getString("code");
-                    String formName = jsonObject.getString("formName");
-                    indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
+                    getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
+
+//                    String code = jsonObject.getString("code");
+//                    String formName = jsonObject.getString("formName");
+//                    if (!formName.equals("Comments") && !formName.equals("Uploads")){
+//                        indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
+//
+//                    }
                 } catch (JSONException e) {
+                    System.out.println("*****1");
                     log.info(e.getMessage());
                 }
 
             });
 
         }catch (Exception e){
+            System.out.println("*****1");
             e.printStackTrace();
         }
 
+        // Create a map to group the indicators by category name
+        Map<String, List<DbFrontendIndicators>> groupedByCategory = new HashMap<>();
+        for (DbFrontendIndicators indicator : indicatorForFrontEnds) {
+            String categoryName = indicator.getCategoryName();
+            if (!groupedByCategory.containsKey(categoryName)) {
+                groupedByCategory.put(categoryName, new LinkedList<>());
+            }
+            groupedByCategory.get(categoryName).add(indicator);
+        }
+
+        // Create a new list of DbFrontendCategoryIndicators
+        List<DbFrontendCategoryIndicators> categoryIndicatorsList = new LinkedList<>();
+        for (String categoryName : groupedByCategory.keySet()) {
+            List<DbFrontendIndicators> categoryIndicators = groupedByCategory.get(categoryName);
+
+            DbFrontendCategoryIndicators category = new DbFrontendCategoryIndicators(categoryName, categoryIndicators);
+            categoryIndicatorsList.add(category);
+        }
+
+
         DbResults dbResults = new DbResults(
-                indicatorForFrontEnds.size(),
-                indicatorForFrontEnds);
+                categoryIndicatorsList.size(),
+                categoryIndicatorsList);
 
         return new Results(200, dbResults);
 
+    }
+
+    private void getIndicatorGroupings(List<DbFrontendIndicators> indicatorForFrontEnds, JSONObject jsonObject) {
+
+        String indicatorId = jsonObject.getString("id");
+        String name  = jsonObject.getString("name");
+        JSONArray dataElements = jsonObject.getJSONArray("dataElements");
+
+        String indicatorName = formatterClass.getIndicatorName(name);
+        String categoryName = formatterClass.mapIndicatorNameToCategory(name);
+
+        List<DbIndicators> dbIndicatorsList = new ArrayList<>();
+
+        for(int i = 0; i < dataElements.length(); i++){
+            JSONObject jsonObject1 = dataElements.getJSONObject(i);
+            String code = jsonObject1.getString("code");
+            String formName = jsonObject1.getString("name");
+            String formId = jsonObject1.getString("id");
+
+            DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
+            dbIndicatorsList.add(dbIndicators);
+        }
+
+        DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
+                indicatorId,
+                categoryName,
+                indicatorName,
+                dbIndicatorsList);
+        indicatorForFrontEnds.add(dbFrontendIndicators);
     }
 
 
@@ -291,19 +345,29 @@ public class VersionServiceImpl implements VersionService {
     }
 
     private List<Indicators> getDataFromRemote() throws URISyntaxException {
+
         List<Indicators> indicators = new LinkedList<>();
-        var  res =GenericWebclient.getForSingleObjResponse(AppConstants.INTERNATIONAL_METADATA_ENDPOINT, String.class);
+
+        var  res = GenericWebclient.getForSingleObjResponse(
+                AppConstants.METADATA_ENDPOINT, String.class);
 
         JSONObject jsObject = new JSONObject(res);
-        JSONArray dataElements = jsObject.getJSONArray("dataElements");
+//        JSONArray dataElements = jsObject.getJSONArray("dataElements");
+        JSONArray dataElements = jsObject.getJSONArray("dataElementGroups");
         dataElements.forEach(element->{
             String  id = ((JSONObject)element).getString("id");
+
             Indicators indicator = new Indicators();
             indicator.setIndicatorId(id);
             indicator.setMetadata(element.toString());
-            indicators.add(indicator);
+
+            boolean isIndicator = indicatorsRepo.existsByIndicatorId(id);
+            if (!isIndicator){
+                indicators.add(indicator);
+            }
 
         });
+
 
         return Lists.newArrayList(indicatorsRepo.saveAll(indicators));
 
