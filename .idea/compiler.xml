@@ -9,15 +9,18 @@
         <outputRelativeToContentRoot value="true" />
         <module name="NationalInstance" />
         <module name="InternationalInstance" />
+        <module name="FileService" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="FileService" target="11" />
       <module name="InternationalInstance" target="11" />
       <module name="NationalInstance" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="FileService" options="-parameters" />
       <module name="InternationalInstance" options="-parameters" />
       <module name="NationalInstance" options="-parameters" />
     </option>
