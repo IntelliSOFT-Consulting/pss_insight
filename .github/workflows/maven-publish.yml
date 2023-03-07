@@ -27,68 +27,69 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - name: Set up Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: 11
-        distribution: temurin
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: temurin
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Build International Instance
-      run: |
-        cd InternationalInstance
-        mvn clean install
+      - name: Build International Instance
+        run: |
+          cd InternationalInstance
+          mvn clean install
 
-    - name: Build & push International Docker image
-      run: |
-        cd InternationalInstance
-        docker build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
-        docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
-        docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
-        docker logout
-
-    - name: Setup SSH keys
-      uses: webfactory/ssh-agent@v0.7.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-#      run: |
-#        mkdir -p ~/.ssh
-#        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-#        chmod 600 ~/.ssh/id_rsa
-#        eval $(ssh-agent)
-#        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
-
-
-    - name: Remote ssh to server and update international instance
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ env.SSH_HOST_INTERNATIONAL }}
-        username: ${{ env.SSH_USER_INTERNATIONAL }}
-        port: ${{ env.SSH_PORT }}
-        script_stop: true
-        script: |
-          if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
-            echo "Check 1"
-            docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
-            docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
-          fi
-          docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          if [ $? -eq 0 ]; then
-            echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
-          else
-            echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
-            exit 1
-          fi
-          docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7009:7009 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+      - name: Build & push International Docker image
+        run: |
+          cd InternationalInstance
+          docker build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
+          docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
+          docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
           docker logout
-          sleep 10
-          
+
+      - name: Setup SSH keys
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #      run: |
+      #        mkdir -p ~/.ssh
+      #        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      #        chmod 600 ~/.ssh/id_rsa
+      #        eval $(ssh-agent)
+      #        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
 
 
-
-
-
+      - name: Remote ssh to server and update international instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.SSH_HOST_INTERNATIONAL }}
+          username: ${{ env.SSH_USER_INTERNATIONAL }}
+          port: ${{ env.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            if docker ps -a --format '{{.Names}}' | grep -q ${{ env.CONTAINER_NAME_INTERNATIONAL }}; then
+              echo "Check 1"
+              docker stop ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+              docker rm ${{ env.CONTAINER_NAME_INTERNATIONAL }}
+            fi
+            docker pull --quiet ${{ env.IMAGE_NAME_INTERNATIONAL }}
+            if [ $? -eq 0 ]; then
+              echo "Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }} pulled successfully"
+            else
+              echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_INTERNATIONAL }}"
+              exit 1
+            fi
+            docker run -d --name ${{ env.CONTAINER_NAME_INTERNATIONAL }} -p 7009:7009 ${{ env.IMAGE_NAME_INTERNATIONAL }}
+            docker logout
+            sleep 10
+  
+  
+  
+  
+  
+  
 
   build_microservice_national:
     runs-on: ubuntu-20.04
@@ -122,7 +123,7 @@ jobs:
           docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
           docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
           docker logout
-          
+
 #      - name: Setup SSH keys
 #        uses: webfactory/ssh-agent@v0.5.0
 #        with:

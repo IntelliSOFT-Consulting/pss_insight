@@ -38,9 +38,6 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public Results getIndicators() throws URISyntaxException {
 
-        /**
-         * TODO: Create the groups that will be used for the indicators
-         */
 
 //        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();

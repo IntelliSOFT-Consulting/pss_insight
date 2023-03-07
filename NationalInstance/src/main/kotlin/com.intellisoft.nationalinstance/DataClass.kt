@@ -171,3 +171,18 @@ data class DbRequestLink(
     val respondentId: String,
     val comments: String?
 )
+data class DbFrontendIndicators(
+    val indicatorId: String,
+    val categoryName: String,
+    val indicatorName: String,
+    val indicators: List<DbIndicators>
+)
+data class DbIndicators(
+    val code: String,
+    val name: String,
+    val id: String
+)
+data class DbFrontendCategoryIndicators(
+    val categoryName: String,
+    val indicators: List<DbFrontendIndicators>
+)
