@@ -137,6 +137,6 @@ jobs:
               echo "Error: Failed to pull Docker image ${{ env.IMAGE_NAME_NATIONAL }}"
               exit 1
             fi
-            docker run -d --name ${{ env.CONTAINER_NAME_NATIONAL }} -p 7008:7008 ${{ env.IMAGE_NAME_NATIONAL }}
+            docker run -d --name ${{ env.CONTAINER_NAME_NATIONAL }} -p 7001:7001 ${{ env.IMAGE_NAME_NATIONAL }}
             docker logout
             sleep 10
