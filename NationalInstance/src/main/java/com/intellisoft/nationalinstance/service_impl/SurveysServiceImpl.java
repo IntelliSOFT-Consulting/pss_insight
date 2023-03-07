@@ -1,6 +1,6 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.intellisoft.internationalinstance.DbDetails;
+import com.intellisoft.nationalinstance.DbDetails;
 import com.intellisoft.nationalinstance.DbResults;
 import com.intellisoft.nationalinstance.DbSurvey;
 import com.intellisoft.nationalinstance.Results;
