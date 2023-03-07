@@ -311,7 +311,7 @@ public class VersionServiceImpl implements VersionService {
 
     }
 
-    private void getIndicatorGroupings(List<DbFrontendIndicators> indicatorForFrontEnds, JSONObject jsonObject) {
+    public void getIndicatorGroupings(List<DbFrontendIndicators> indicatorForFrontEnds, JSONObject jsonObject) {
 
         String indicatorId = jsonObject.getString("id");
         String name  = jsonObject.getString("name");

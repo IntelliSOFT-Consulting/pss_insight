@@ -158,15 +158,13 @@ data class DbSurveyDetails(
 )
 data class DbResponse(
     val respondentId: String,
-    val indicator: DbIndicator
-)
-
-data class DbIndicator(
     val indicatorId: String,
     val answer: String,
     val comments: String?,
     val attachment: String?
 )
+
+
 data class DbRequestLink(
     val respondentId: String,
     val comments: String?
@@ -185,4 +183,14 @@ data class DbIndicators(
 data class DbFrontendCategoryIndicators(
     val categoryName: String,
     val indicators: List<DbFrontendIndicators>
+)
+data class DbSurveyRespondentDetails(
+    val surveyId: String,
+    val surveyName: String,
+    val respondents: List<DbRespondentDetails>
+)
+data class DbRespondentDetails(
+    val id:String,
+    val emailAddress : String,
+    val date: String
 )

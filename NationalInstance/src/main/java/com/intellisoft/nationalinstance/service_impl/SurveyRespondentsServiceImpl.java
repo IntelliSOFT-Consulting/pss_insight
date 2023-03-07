@@ -12,11 +12,15 @@ import com.intellisoft.nationalinstance.db.repso.SurveyRespondentsRepo;
 import com.intellisoft.nationalinstance.util.EmailService;
 import kotlin.Triple;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
 
 import javax.mail.MessagingException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +29,19 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
     private final SurveyRespondentsRepo respondentsRepo;
 
     private final FormatterClass formatterClass = new FormatterClass();
-    private final EmailService emailService;
-
     private final SurveysService surveysService;
     private final IndicatorsRepo indicatorsRepo;
     private final RespondentAnswersRepo respondentAnswersRepo;
     private final SurveyResendRequestsRepo surveyResendRequestsRepo;
+    private final VersionServiceImpl versionService;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    public TemplateEngine templateEngine;
+
+    private final EmailService emailService;
 
 
     @Override
@@ -57,28 +68,34 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
                           String surveyId,
                           String customAppUrl ){
 
-        try{
-            String password = formatterClass.getOtp();
-            String htmlMsg = "<body style='border:2px solid black'>"
-                    +"Hello User, \n Please Click on this link to continue to the survey"+
-                    customAppUrl +
-                    "Your Password is: " + password +
-                    "</body>";
+        String password = formatterClass.getOtp();
 
-            SurveyRespondents surveyRespondents = new SurveyRespondents();
-            surveyRespondents.setSurveyId(surveyId);
-            surveyRespondents.setEmailAddress(emailAddress);
-            surveyRespondents.setPassword(password);
-            surveyRespondents.setStatus(PublishStatus.SENT.name());
-            surveyRespondents.setExpiryTime(expiryDateTime);
-            surveyRespondents.setCustomUrl(customAppUrl);
+        SurveyRespondents surveyRespondents = new SurveyRespondents();
+        surveyRespondents.setSurveyId(surveyId);
+        surveyRespondents.setEmailAddress(emailAddress);
 
+        surveyRespondents.setStatus(PublishStatus.SENT.name());
+        surveyRespondents.setCustomUrl(customAppUrl);
+
+        surveyRespondents.setPassword(password);
+        surveyRespondents.setExpiryTime(expiryDateTime);
+
+        Optional<SurveyRespondents> optionalSurveyRespondents =
+                respondentsRepo.findByEmailAddressAndSurveyId(emailAddress, surveyId);
+        if (optionalSurveyRespondents.isPresent()){
+            SurveyRespondents surveyDbRespondents = optionalSurveyRespondents.get();
+            surveyDbRespondents.setPassword(password);
+            surveyDbRespondents.setExpiryTime(expiryDateTime);
+            respondentsRepo.save(surveyDbRespondents);
+        }else {
             respondentsRepo.save(surveyRespondents);
-
-            emailService.sendEmail(emailAddress,"QUESTIONS",htmlMsg);
-        }catch (MessagingException e ){
-            e.printStackTrace();
         }
+
+        formatterClass.sendMail(
+                mailSender,
+                templateEngine,
+                emailAddress,
+                customAppUrl);
 
 
 
@@ -87,11 +104,28 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
     @Override
     public Results listSurveyRespondent(String surveyId) {
 
+        List<DbRespondentDetails> dbRespondentDetailsList = new ArrayList<>();
+
         List<SurveyRespondents> respondentsList =
                 respondentsRepo.findAllBySurveyId(surveyId);
+
+        for (int j = 0; j< respondentsList.size(); j++){
+
+            String respondentId = String.valueOf(respondentsList.get(j).getId());
+            String emailAddress = respondentsList.get(j).getEmailAddress();
+            String createdAt = String.valueOf(respondentsList.get(j).getCreatedAt());
+
+            DbRespondentDetails dbRespondentDetails = new DbRespondentDetails(
+                    respondentId,
+                    emailAddress,
+                    createdAt);
+            dbRespondentDetailsList.add(dbRespondentDetails);
+
+        }
+
         DbResults dbResults = new DbResults(
-                respondentsList.size(),
-                respondentsList);
+                dbRespondentDetailsList.size(),
+                dbRespondentDetailsList);
 
         return new Results(200, dbResults);
     }
@@ -143,37 +177,77 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
     @Override
     public Results getAssignedSurvey(String id) {
 
+        List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
+
         Optional<SurveyRespondents> optionalSurveyRespondents =
                 respondentsRepo.findById(Long.valueOf(id));
         if (optionalSurveyRespondents.isPresent()) {
             SurveyRespondents surveyRespondents = optionalSurveyRespondents.get();
-            Long surveyId = Long.valueOf(surveyRespondents.getSurveyId());
+            String surveyId = surveyRespondents.getSurveyId();
+
             Results results = surveysService.surveyDetails(surveyId);
             if (results.getCode() == 200){
                 Surveys surveys = (Surveys) results.getDetails();
+
                 if (surveys != null){
                     List<String> stringList = surveys.getIndicators();
-                    List<String> metaData = indicatorsRepo.findMetadataByIndicatorIds(stringList);
 
-                    System.out.println("**********");
-                    System.out.println(metaData);
+                    List<String> metaDataList = indicatorsRepo.findMetadataByIndicatorIds(stringList);
+
+                    try {
+
+                        for(int j = 0; j < metaDataList.size(); j++){
+                            String s = metaDataList.get(j);
+                            JSONObject jsonObject = new JSONObject(s);
+                            versionService.getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
+                        }
+
+                    } catch (JSONException e) {
+                        System.out.println("*****1");
+                        e.printStackTrace();
+                    }
+
+                    // Create a map to group the indicators by category name
+                    Map<String, List<DbFrontendIndicators>> groupedByCategory = new HashMap<>();
+                    for (DbFrontendIndicators indicator : indicatorForFrontEnds) {
+                        String categoryName = indicator.getCategoryName();
+                        if (!groupedByCategory.containsKey(categoryName)) {
+                            groupedByCategory.put(categoryName, new LinkedList<>());
+                        }
+                        groupedByCategory.get(categoryName).add(indicator);
+                    }
+
+                    // Create a new list of DbFrontendCategoryIndicators
+                    List<DbFrontendCategoryIndicators> categoryIndicatorsList = new LinkedList<>();
+                    for (String categoryName : groupedByCategory.keySet()) {
+                        List<DbFrontendIndicators> categoryIndicators = groupedByCategory.get(categoryName);
+
+                        DbFrontendCategoryIndicators category = new DbFrontendCategoryIndicators(categoryName, categoryIndicators);
+                        categoryIndicatorsList.add(category);
+                    }
+
+                    DbResults dbResults = new DbResults(
+                            categoryIndicatorsList.size(),
+                            categoryIndicatorsList);
+                    return new Results(200, dbResults);
+
 
                 }
 
             }
         }
+        return new Results(400, "We could not find any indicators.");
 
-        return null;
     }
 
     @Override
     public Results saveResponse(DbResponse dbResponse) {
 
         String respondentId = dbResponse.getRespondentId();
-        String indicatorId = dbResponse.getIndicator().getIndicatorId();
-        String answer = dbResponse.getIndicator().getAnswer();
-        String comments = dbResponse.getIndicator().getComments();
-        String attachment = dbResponse.getIndicator().getAttachment();
+        String indicatorId = dbResponse.getIndicatorId();
+        String answer = dbResponse.getAnswer();
+        String comments = dbResponse.getComments();
+        String attachment = dbResponse.getAttachment();
 
         RespondentAnswers respondentAnswers = new RespondentAnswers(
                 respondentId, indicatorId, answer, comments, attachment);
@@ -207,6 +281,7 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             String emailAddress = surveyRespondents.getEmailAddress();
             String customAppUrl = surveyRespondents.getCustomUrl();
             String expiryDateTime = surveyRespondents.getExpiryTime();
+            String surveyId = surveyRespondents.getSurveyId();
 
             /**
              * Check expiry time
@@ -214,28 +289,18 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             Triple<Long, Long, Long> tripleData = formatterClass.getRemainingTime(expiryDateTime);
             Long days = tripleData.getFirst();
             if (days > 1){
-                try{
-                    String password = formatterClass.getOtp();
-                    String htmlMsg = "<body style='border:2px solid black'>"
-                            +"Hello User, \n Please Click on this link to continue to the survey"+
-                            customAppUrl +
-                            "Your Password is: " + password +
-                            "</body>";
+                String password = formatterClass.getOtp();
 
-                    surveyRespondents.setEmailAddress(emailAddress);
-                    surveyRespondents.setPassword(password);
-                    surveyRespondents.setStatus(PublishStatus.ACCEPTED.name());
-                    surveyRespondents.setExpiryTime(expiryDateTime);
-                    surveyRespondents.setCustomUrl(customAppUrl);
+                surveyRespondents.setEmailAddress(emailAddress);
+                surveyRespondents.setPassword(password);
+                surveyRespondents.setStatus(PublishStatus.ACCEPTED.name());
+                surveyRespondents.setExpiryTime(expiryDateTime);
+                surveyRespondents.setCustomUrl(customAppUrl);
 
-                    respondentsRepo.save(surveyRespondents);
+                respondentsRepo.save(surveyRespondents);
+                sendMail(emailAddress, expiryDateTime, surveyId, customAppUrl);
 
-                    emailService.sendEmail(emailAddress,"QUESTIONS",htmlMsg);
-
-                    return new Results(200, new DbDetails("Email sent."));
-                }catch (MessagingException e ){
-                    e.printStackTrace();
-                }
+                return new Results(200, new DbDetails("Email sent."));
             }else {
                 return new Results(400,"The expiry date has reached.");
             }

@@ -1,14 +1,15 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.intellisoft.nationalinstance.DbDetails;
-import com.intellisoft.nationalinstance.DbResults;
-import com.intellisoft.nationalinstance.DbSurvey;
-import com.intellisoft.nationalinstance.Results;
+import com.intellisoft.nationalinstance.*;
+import com.intellisoft.nationalinstance.db.SurveyRespondents;
 import com.intellisoft.nationalinstance.db.Surveys;
+import com.intellisoft.nationalinstance.db.repso.SurveyRespondentsRepo;
 import com.intellisoft.nationalinstance.db.repso.SurveysRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class SurveysServiceImpl implements SurveysService{
 
     private final SurveysRepo surveysRepo;
+    private final SurveyRespondentsRepo respondentsRepo;
 
     @Override
     public Results addSurvey(DbSurvey dbSurvey) {
@@ -33,13 +35,13 @@ public class SurveysServiceImpl implements SurveysService{
         surveys.setStatus(status);
         surveys.setCreatorId(creatorId);
         surveys.setIndicators(indicatorList);
-
+        surveysRepo.save(surveys);
 
         return new Results(201, surveys);
     }
 
     @Override
-    public Results listSurveys(String creatorId) {
+    public Results listAdminSurveys(String creatorId) {
 
         List<Surveys> surveysList = surveysRepo.findAllByCreatorId(creatorId);
         DbResults dbResults = new DbResults(
@@ -50,10 +52,49 @@ public class SurveysServiceImpl implements SurveysService{
     }
 
     @Override
-    public Results surveyDetails(Long id) {
+    public Results listRespondentsSurveys(String creatorId) {
+        List<DbSurveyRespondentDetails> dbSurveyRespondentDetailsList = new ArrayList<>();
+        List<Surveys> surveysList = surveysRepo.findAllByCreatorId(creatorId);
+        for (int i = 0; i < surveysList.size(); i++){
+
+            String surveyId = String.valueOf(surveysList.get(i).getId());
+            String surveyName = surveysList.get(i).getName();
+            List<SurveyRespondents> respondentsList =
+                    respondentsRepo.findAllBySurveyId(surveyId);
+
+            List<DbRespondentDetails> dbRespondentDetailsList = new ArrayList<>();
+            for (int j = 0; j< respondentsList.size(); j++){
+
+                String respondentId = String.valueOf(respondentsList.get(j).getId());
+                String emailAddress = respondentsList.get(j).getEmailAddress();
+                String createdAt = String.valueOf(respondentsList.get(j).getCreatedAt());
+
+                DbRespondentDetails dbRespondentDetails = new DbRespondentDetails(
+                        respondentId,
+                        emailAddress,
+                        createdAt);
+                dbRespondentDetailsList.add(dbRespondentDetails);
+
+            }
+            DbSurveyRespondentDetails dbSurveyRespondentDetails = new DbSurveyRespondentDetails(
+                    surveyId,
+                    surveyName,
+                    dbRespondentDetailsList);
+            dbSurveyRespondentDetailsList.add(dbSurveyRespondentDetails);
+
+        }
+        DbResults dbResults = new DbResults(
+                dbSurveyRespondentDetailsList.size(),
+                dbSurveyRespondentDetailsList);
+
+        return new Results(200, dbResults);
+    }
+
+    @Override
+    public Results surveyDetails(String id) {
 
         Optional<Surveys> optionalSurveys =
-                surveysRepo.findById(id);
+                surveysRepo.findById(Long.valueOf(id));
         return optionalSurveys.map(surveys ->
                 new Results(200, surveys))
                 .orElse(
