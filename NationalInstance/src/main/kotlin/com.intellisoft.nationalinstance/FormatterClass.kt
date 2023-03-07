@@ -2,10 +2,14 @@ package com.intellisoft.nationalinstance
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.http.*
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.util.Base64Utils
 import org.springframework.web.client.RestTemplate
+import org.thymeleaf.TemplateEngine
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.time.Duration
@@ -13,9 +17,53 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
+import javax.mail.internet.MimeMessage
+import org.thymeleaf.context.Context
 
 class FormatterClass {
 
+    fun sendMail(emailSender: JavaMailSender,
+                 templateEngine: TemplateEngine,
+                 emailAddress: String,
+                 customUrl: String){
+
+        CoroutineScope(Dispatchers.IO).launch {
+            sendRegLink(emailSender,emailAddress, customUrl,templateEngine)
+        }
+    }
+    private suspend fun sendRegLink(
+        emailSender: JavaMailSender,
+        emailAddress: String,
+        customUrl: String,
+        templateEngine: TemplateEngine){
+        coroutineScope {
+            launch(Dispatchers.IO){
+
+
+
+                val subject = "PSS Survey"
+                val greeting = "Dear $emailAddress, "
+                val action = customUrl
+                val message = "Use this to verify your email address in 5 minutes.\n\n$action \n\n " +
+                        "If you did not initiate this process please ignore the message"
+
+                val context = Context()
+                context.setVariable("subject", subject)
+                context.setVariable("greeting", greeting)
+                context.setVariable("message", message)
+                context.setVariable("action", "")
+
+                val process: String = templateEngine.process("notifications", context)
+                val mimeMessage: MimeMessage = emailSender.createMimeMessage()
+                val helper = MimeMessageHelper(mimeMessage)
+                helper.setSubject(subject)
+                helper.setText(process, true)
+                helper.setTo(emailAddress)
+                emailSender.send(mimeMessage)
+
+            }
+        }
+    }
     fun getIndicatorName(indicatorName: String): String{
 
         var name = ""

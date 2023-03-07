@@ -186,3 +186,13 @@ data class DbFrontendCategoryIndicators(
     val categoryName: String,
     val indicators: List<DbFrontendIndicators>
 )
+data class DbSurveyRespondentDetails(
+    val surveyId: String,
+    val surveyName: String,
+    val respondents: List<DbRespondentDetails>
+)
+data class DbRespondentDetails(
+    val id:String,
+    val emailAddress : String,
+    val date: String
+)
