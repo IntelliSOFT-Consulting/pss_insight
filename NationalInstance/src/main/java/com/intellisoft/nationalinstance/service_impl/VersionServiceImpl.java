@@ -187,30 +187,58 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public Results getVersion(long versionId) {
-        /**
-         * TODO: Check on the 2 tier groupings
-         * Categories and the Indicator names
-         *
-         */
-
         Results results;
 
         Optional<VersionEntity> optionalVersionEntity =
                 versionRepos.findById(versionId);
+        List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         if (optionalVersionEntity.isPresent()){
 
             VersionEntity versionEntity = optionalVersionEntity.get();
             List<String> entityIndicators = versionEntity.getIndicators();
 
-            List<String> metaDataList = indicatorsRepo.findMetadataByIndicatorIds(entityIndicators);
+            List<String> metaDataList = indicatorsRepo.findByIndicatorIds(entityIndicators);
+
+            try {
+
+                for(int j = 0; j < metaDataList.size(); j++){
+                    String s = metaDataList.get(j);
+                    JSONObject jsonObject = new JSONObject(s);
+                    getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
+                }
+
+            } catch (JSONException e) {
+                System.out.println("*****1");
+                e.printStackTrace();
+            }
+
+            // Create a map to group the indicators by category name
+            Map<String, List<DbFrontendIndicators>> groupedByCategory = new HashMap<>();
+            for (DbFrontendIndicators indicator : indicatorForFrontEnds) {
+                String categoryName = indicator.getCategoryName();
+                if (!groupedByCategory.containsKey(categoryName)) {
+                    groupedByCategory.put(categoryName, new LinkedList<>());
+                }
+                groupedByCategory.get(categoryName).add(indicator);
+            }
+
+            // Create a new list of DbFrontendCategoryIndicators
+            List<DbFrontendCategoryIndicators> categoryIndicatorsList = new LinkedList<>();
+            for (String categoryName : groupedByCategory.keySet()) {
+                List<DbFrontendIndicators> categoryIndicators = groupedByCategory.get(categoryName);
+
+                DbFrontendCategoryIndicators category = new DbFrontendCategoryIndicators(categoryName, categoryIndicators);
+                categoryIndicatorsList.add(category);
+            }
+
 
             DbIndicatorValues dbIndicatorValues = new DbIndicatorValues(
                     versionEntity.getVersionName(),
                     versionEntity.getVersionDescription(),
                     versionId,
                     versionEntity.getStatus(),
-                    metaDataList);
+                    categoryIndicatorsList);
 
             results = new Results(200, dbIndicatorValues);
 
