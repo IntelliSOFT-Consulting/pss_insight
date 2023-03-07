@@ -14,7 +14,7 @@ env:
   SSH_HOST_INTERNATIONAL: ${{ secrets.SSH_HOST_INTERNATIONAL }}
   SSH_USER_INTERNATIONAL: ${{ secrets.SSH_USER_INTERNATIONAL }}
   CONTAINER_NAME_INTERNATIONAL: dhis_pss_international
-  IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v2
+  IMAGE_NAME_INTERNATIONAL: dnjau/dhis_pss_international:v3
 
   SSH_PASS_1: ${{ secrets.SSH_PRIVATE_KEY }}
   SSH_HOST_2: ${{ secrets.SSH_HOST_2 }}
@@ -52,13 +52,6 @@ jobs:
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #      run: |
-      #        mkdir -p ~/.ssh
-      #        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #        chmod 600 ~/.ssh/id_rsa
-      #        eval $(ssh-agent)
-      #        echo "${{ secrets.SSH_PASSPHRASE }}" | ssh-add -
-
 
       - name: Remote ssh to server and update international instance
         uses: appleboy/ssh-action@master
@@ -85,45 +78,40 @@ jobs:
             docker logout
             sleep 10
   
-  
-  
-  
-  
-  
 
-  build_microservice_national:
-    runs-on: ubuntu-20.04
-
-    steps:
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 11
-          distribution: temurin
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build National Instance
-        run: |
-          cd NationalInstance
-          mvn clean install
-
-      - name: Build & push National Docker image
-        run: |
-          cd NationalInstance
-          docker buildx build -t ${{ env.IMAGE_NAME_NATIONAL }} .
-          docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
-          docker push ${{ env.IMAGE_NAME_NATIONAL }}
-          docker logout
-
-      - name: Build & push International Docker image
-        run: |
-          cd NationalInstance
-          docker buildx build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
-          docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
-          docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
-          docker logout
-
+#  build_microservice_national:
+#    runs-on: ubuntu-20.04
+#
+#    steps:
+#      - name: Set up Java
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: 11
+#          distribution: temurin
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Build National Instance
+#        run: |
+#          cd NationalInstance
+#          mvn clean install
+#
+#      - name: Build & push National Docker image
+#        run: |
+#          cd NationalInstance
+#          docker buildx build -t ${{ env.IMAGE_NAME_NATIONAL }} .
+#          docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
+#          docker push ${{ env.IMAGE_NAME_NATIONAL }}
+#          docker logout
+#
+#      - name: Build & push International Docker image
+#        run: |
+#          cd NationalInstance
+#          docker buildx build -t ${{ env.IMAGE_NAME_INTERNATIONAL }} .
+#          docker login -u ${{ env.DOCKER_USERNAME }} -p ${{ env.DOCKER_PASSWORD }}
+#          docker push ${{ env.IMAGE_NAME_INTERNATIONAL }}
+#          docker logout
+#
 #      - name: Setup SSH keys
 #        uses: webfactory/ssh-agent@v0.5.0
 #        with:
