@@ -14,6 +14,8 @@ public interface IndicatorsRepo extends CrudRepository<Indicators, Long> {
     List<String> findMetadataByIndicatorIds(List<String> indicatorIds);
     @Query("SELECT i FROM Indicators i WHERE i.indicatorId in :indicatorIds")
     List<Indicators> findIndicatorByIndicatorIds(List<String> indicatorIds);
+    @Query("SELECT i.metadata FROM Indicators i WHERE i.indicatorId in :indicatorIds")
+    List<String> findByIndicatorIds(List<String> indicatorIds);
 
     Boolean existsByIndicatorId(String indicatorId);
 

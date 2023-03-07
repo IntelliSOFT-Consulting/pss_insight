@@ -124,7 +124,7 @@ data class DbIndicatorValues(
     val versionDescription:String,
     val versionId: Long,
     val status: String,
-    val indicators: List<String>, )
+    val indicators: Any, )
 data class DbDataEntryData(
     val selectedPeriod: String?,
     val status: String?,
