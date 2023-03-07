@@ -158,15 +158,13 @@ data class DbSurveyDetails(
 )
 data class DbResponse(
     val respondentId: String,
-    val indicator: DbIndicator
-)
-
-data class DbIndicator(
     val indicatorId: String,
     val answer: String,
     val comments: String?,
     val attachment: String?
 )
+
+
 data class DbRequestLink(
     val respondentId: String,
     val comments: String?
