@@ -80,6 +80,13 @@ public class MetadataJsonServiceImpl implements MetadataJsonService{
     }
 
     @Override
+    public MetadataJson getMetadataJsonByCode(String code) {
+        Optional<MetadataJson> optionalMetadataJson =
+                metadataJsonRepo.findByCode(code);
+        return optionalMetadataJson.orElse(null);
+    }
+
+    @Override
     public MetadataJson updateMetadataJson(String id, MetadataJson metadataJson) {
         Optional<MetadataJson> optionalMetadataJson =
                 metadataJsonRepo.findById(id);
