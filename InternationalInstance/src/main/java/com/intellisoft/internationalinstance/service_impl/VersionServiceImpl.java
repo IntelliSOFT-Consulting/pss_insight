@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
@@ -35,6 +36,8 @@ public class VersionServiceImpl implements VersionService {
     private final IndicatorsRepo indicatorsRepo;
     private final VersionRepos versionRepos;
     private final FormatterClass formatterClass = new FormatterClass();
+    private final MetadataJsonService metadataJsonService;
+
     @Override
     public Results getIndicators() throws URISyntaxException {
 
@@ -44,7 +47,9 @@ public class VersionServiceImpl implements VersionService {
 
         try{
 
+            metadataJsonService.getMetadataData();
             getDataFromRemote();
+
             List<Indicators> indicators = indicatorsRepo.findAll();
 
             indicators.forEach(indicator -> {
@@ -301,12 +306,23 @@ public class VersionServiceImpl implements VersionService {
 
         for(int i = 0; i < dataElements.length(); i++){
             JSONObject jsonObject1 = dataElements.getJSONObject(i);
-            String code = jsonObject1.getString("code");
-            String formName = jsonObject1.getString("name");
-            String formId = jsonObject1.getString("id");
 
-            DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
-            dbIndicatorsList.add(dbIndicators);
+            if (jsonObject1.has("code") &&
+                    jsonObject1.has("name") &&
+                    jsonObject1.has("id")){
+                String code = jsonObject1.getString("code");
+                String formName = jsonObject1.getString("name");
+                String formId = jsonObject1.getString("id");
+
+                if (!code.contains("Comments") && !code.contains("Uploads")){
+                    DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
+                    dbIndicatorsList.add(dbIndicators);
+                }
+
+
+            }
+
+
         }
 
         DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
@@ -371,6 +387,9 @@ public class VersionServiceImpl implements VersionService {
         return Lists.newArrayList(indicatorsRepo.saveAll(indicators));
 
     }
+
+
+
     private JSONObject getRawRemoteData() throws URISyntaxException {
         var  res =GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_ENDPOINT, String.class);
         return new  JSONObject(res);
