@@ -22,7 +22,7 @@ data class DbDataEntry(
     val eventDate: String,
     val status: String,
     val storedBy: String,
-    val dataValues: ArrayList<DbDataValues>
+    val dataValues: List<DbDataValues>
 )
 data class DbDataValues(
     val dataElement: String,
@@ -126,9 +126,10 @@ data class DbIndicatorValues(
     val status: String,
     val indicators: Any, )
 data class DbDataEntryData(
+    val orgUnit: String,
     val selectedPeriod: String?,
     val status: String?,
-    val dataEntryPersonId: String?,
+    val dataEntryPersonId: String,
     val dataEntryDate: String?,
     val responses: List<DbDataEntryResponses>,
 )
