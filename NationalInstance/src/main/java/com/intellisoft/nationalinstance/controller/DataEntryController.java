@@ -30,8 +30,14 @@ public class DataEntryController {
     public ResponseEntity<?> addDataEntry(
             @RequestBody DbDataEntryData dbDataEntryData) {
 
-        Results results = dataEntryService.addDataEntry(dbDataEntryData);
+        Results results;
+        try {
+            results = dataEntryService.addDataEntry(dbDataEntryData);
+        }catch (URISyntaxException u){
+            results = new Results(400, "Please try again.");
+        }
         return formatterClass.getResponse(results);
+
     }
 
     /**

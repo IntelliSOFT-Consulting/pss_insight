@@ -47,7 +47,12 @@ public class GenericWebclient {
      */
 
     @SafeVarargs
-    public  static<T ,V, E extends Exception> V postForSingleObjResponse(String url, T request, Class<T> requestClass, Class<V> responseClass, E... exceptions) throws URISyntaxException {
+    public  static<T ,V, E extends Exception> V postForSingleObjResponse(
+            String url,
+            T request,
+            Class<T> requestClass,
+            Class<V> responseClass,
+            E... exceptions) throws URISyntaxException {
     log.info("REQUEST: {},{}", url,"request");
         return myWebClient().post()
                 .uri(new URI(url))

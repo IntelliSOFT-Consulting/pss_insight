@@ -6,6 +6,7 @@ import com.intellisoft.nationalinstance.DbVersionData;
 import com.intellisoft.nationalinstance.PublishStatus;
 import com.intellisoft.nationalinstance.Results;
 import com.intellisoft.nationalinstance.db.Indicators;
+import com.intellisoft.nationalinstance.db.MetadataJson;
 import com.intellisoft.nationalinstance.db.VersionEntity;
 import com.intellisoft.nationalinstance.db.repso.IndicatorsRepo;
 import com.intellisoft.nationalinstance.db.repso.VersionRepos;
@@ -31,6 +32,7 @@ public class VersionServiceImpl implements VersionService {
     private final IndicatorsRepo indicatorsRepo;
     private final VersionRepos versionRepos;
     private final FormatterClass formatterClass = new FormatterClass();
+    private final MetadataJsonService metadataJsonService;
 
 //    @Override
 //    public List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException {
@@ -77,6 +79,7 @@ public class VersionServiceImpl implements VersionService {
 
         String versionNo = "1";
 
+        //Generate versions
         if (dbVersionData.getVersionId() != null){
             long versionId = dbVersionData.getVersionId();
             var vs = versionRepos.findById(versionId);
@@ -101,8 +104,9 @@ public class VersionServiceImpl implements VersionService {
 
         }
 
+        String versionNumber = "vv"+versionNo;
         //Set the version number
-        version.setVersionName(versionNo);
+        version.setVersionName(versionNumber);
         version.setIndicators(indicatorList);
         version.setVersionDescription(versionDescription);
         version.setStatus(status);
@@ -113,32 +117,83 @@ public class VersionServiceImpl implements VersionService {
         //Check if we're required to publish
         if(isPublished){
 
-            List<String> metaData = indicatorsRepo.findMetadataByIndicatorIds(indicatorList);
-            if (!metaData.isEmpty()) {
-                JSONObject jsonObject = getRawRemoteData();
-                jsonObject.put("dataElements", new JSONArray(metaData));
-                jsonObject.put("version", versionNo);
+            /**
+             * From the indicator list get the particular data points
+             * From the indicator id, get the metadata json and push datapoint, comments and uploads
+             * Use the code to get the comment and the uploads
+             */
+
+            List<String> metaDataList = indicatorsRepo.findByIndicatorIds(indicatorList);
+
+            if (!metaDataList.isEmpty()){
+
+                JSONObject jsonObjectMetadataJson = getRawRemoteData();
+                JSONArray dataElementsArray = new JSONArray();
+
+                for (String s : metaDataList){
+                    JSONObject jsonObject = new JSONObject(s);
+                    JSONArray dataElements = jsonObject.getJSONArray("dataElements");
+                    dataElements.forEach(element->{
+
+                        if (((JSONObject)element).has("id")){
+                            String  indicatorId = ((JSONObject)element).getString("id");
+                            MetadataJson metadataJson = metadataJsonService.getMetadataJson(indicatorId);
+                            if (metadataJson != null){
+
+                                String code = metadataJson.getCode();
+                                String metadataDataPoint = metadataJson.getMetadata();
+
+                                String codeComment = code+"_Comments";
+                                String codeUploads = code+"_Uploads";
+
+                                MetadataJson metadataJsonComment = metadataJsonService.getMetadataJsonByCode(codeComment);
+                                if (metadataJsonComment != null){
+                                    String metadataDataComment = metadataJsonComment.getMetadata();
+                                    JSONObject jsonObjectMetadata = new JSONObject(metadataDataComment);
+                                    dataElementsArray.put(jsonObjectMetadata);
+                                }
+                                MetadataJson metadataJsonUploads = metadataJsonService.getMetadataJsonByCode(codeUploads);
+                                if (metadataJsonUploads != null){
+                                    String metadataDataUpload = metadataJsonUploads.getMetadata();
+                                    JSONObject jsonObjectMetadata = new JSONObject(metadataDataUpload);
+                                    dataElementsArray.put(jsonObjectMetadata);
+                                }
+                                JSONObject jsonObjectMetadata = new JSONObject(metadataDataPoint);
+                                dataElementsArray.put(jsonObjectMetadata);
+
+                            }
+                        }
+
+                    });
+
+                }
+
+                jsonObjectMetadataJson.put("dataElements", new JSONArray(dataElementsArray));
+                jsonObjectMetadataJson.put("version", versionNumber);
+                jsonObjectMetadataJson.put("versionDescription", versionDescription);
+
 
                 var response = GenericWebclient.postForSingleObjResponse(
-                        AppConstants.DATA_STORE_ENDPOINT+versionNo,
-                        jsonObject,
+                        AppConstants.DATA_STORE_ENDPOINT+versionNumber,
+                        jsonObjectMetadataJson,
                         JSONObject.class,
                         Response.class);
                 log.info("RESPONSE FROM REMOTE: {}",response.toString());
                 if (response.getHttpStatusCode() < 200) {
                     throw new CustomException("Unable to create/update record on data store"+response);
                 }else {
-                    versionRepos.updateAllIsPublishedToFalse(PublishStatus.DRAFT.name());
+//                    versionRepos.updateAllIsPublishedToFalse(PublishStatus.DRAFT.name());
 
                     version.setStatus(PublishStatus.PUBLISHED.name());
                     if (publishedBy != null){
                         version.setPublishedBy(publishedBy);
                     }
                 }
-            }
-            else {
+
+            }else {
                 throw new CustomException("No indicators found for the ids given"+indicatorList);
             }
+
 
         }
 
@@ -256,7 +311,7 @@ public class VersionServiceImpl implements VersionService {
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         try{
-
+            metadataJsonService.getMetadataData();
             getDataFromRemote();
             List<Indicators> indicators = indicatorsRepo.findAll();
 
@@ -324,12 +379,22 @@ public class VersionServiceImpl implements VersionService {
 
         for(int i = 0; i < dataElements.length(); i++){
             JSONObject jsonObject1 = dataElements.getJSONObject(i);
-            String code = jsonObject1.getString("code");
-            String formName = jsonObject1.getString("name");
-            String formId = jsonObject1.getString("id");
 
-            DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
-            dbIndicatorsList.add(dbIndicators);
+            if (jsonObject1.has("code") &&
+                    jsonObject1.has("name") &&
+                    jsonObject1.has("id")){
+                String code = jsonObject1.getString("code");
+                String formName = jsonObject1.getString("name");
+                String formId = jsonObject1.getString("id");
+
+                if (!code.contains("Comments") && !code.contains("Uploads")){
+                    DbIndicators dbIndicators = new DbIndicators(code, formName, formId);
+                    dbIndicatorsList.add(dbIndicators);
+                }
+
+
+            }
+
         }
 
         DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
