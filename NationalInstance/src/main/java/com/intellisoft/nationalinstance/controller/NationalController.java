@@ -4,6 +4,8 @@ import com.intellisoft.nationalinstance.DbDataElementsValue;
 import com.intellisoft.nationalinstance.DbDataEntry;
 import com.intellisoft.nationalinstance.FormatterClass;
 import com.intellisoft.nationalinstance.Results;
+import com.intellisoft.nationalinstance.db.IndicatorDescription;
+import com.intellisoft.nationalinstance.service_impl.IndicatorDescriptionService;
 import com.intellisoft.nationalinstance.service_impl.NationalService;
 import com.intellisoft.nationalinstance.service_impl.VersionService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class NationalController {
 
     private final NationalService nationalService;
     private final VersionService versionService;
+    private final IndicatorDescriptionService indicatorDescriptionService;
 
     @GetMapping(value = "/organisation-unit")
     public ResponseEntity<?> getOrganisationUnit(){
@@ -40,6 +43,22 @@ public class NationalController {
     public ResponseEntity<?> getIndicatorForFrontEnd() throws URISyntaxException {
         Results results = versionService.getIndicators();
         return formatterClass.getResponse(results);
+    }
+
+    /**
+     * Get Indicator Details
+     */
+    @GetMapping(value = "/indicator-description/{indicatorCode}")
+    public ResponseEntity<?> getIndicatorDescriptionByCode(@PathVariable("indicatorCode") String indicatorCode){
+        Results results;
+        IndicatorDescription indicatorDescription = indicatorDescriptionService.getIndicatorDescriptionByCode(indicatorCode);
+        if (indicatorDescription != null){
+            results = new Results(200, indicatorDescription);
+        }else {
+            results = new Results(400, "Indicator description not found.");
+        }
+        return formatterClass.getResponse(results);
+
     }
 //    @GetMapping(value = "/versions")
 //    public ResponseEntity<?> getVersions(

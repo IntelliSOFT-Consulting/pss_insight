@@ -22,16 +22,29 @@ import org.thymeleaf.context.Context
 
 class FormatterClass {
 
+    fun getNextVersion(list:List<Any>):Int{
+
+        val intList = list.map { it.toString().toIntOrNull() }
+        val filteredList = intList.filterIsInstance<Int>()
+        val largestValue = filteredList.maxOrNull()
+
+        return if (largestValue != null){
+            largestValue + 1
+        }else{
+            1
+        }
+    }
+
     fun sendMail(emailSender: JavaMailSender,
                  templateEngine: TemplateEngine,
                  emailAddress: String,
                  customUrl: String){
 
         CoroutineScope(Dispatchers.IO).launch {
-            sendRegLink(emailSender,emailAddress, customUrl,templateEngine)
+            sendSurveyLink(emailSender,emailAddress, customUrl,templateEngine)
         }
     }
-    private suspend fun sendRegLink(
+    private suspend fun sendSurveyLink(
         emailSender: JavaMailSender,
         emailAddress: String,
         customUrl: String,

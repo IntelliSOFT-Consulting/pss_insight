@@ -171,6 +171,7 @@ data class DbRequestLink(
     val comments: String?
 )
 data class DbFrontendIndicators(
+    val code: String,
     val indicatorId: String,
     val categoryName: String,
     val indicatorName: String,

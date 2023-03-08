@@ -1,5 +1,6 @@
 package com.intellisoft.nationalinstance.service_impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.intellisoft.nationalinstance.*;
 import com.intellisoft.nationalinstance.db.RespondentAnswers;
 import com.intellisoft.nationalinstance.db.SurveyResendRequests;
@@ -19,8 +20,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 
-import javax.mail.MessagingException;
 import java.util.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -91,15 +92,16 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             respondentsRepo.save(surveyRespondents);
         }
 
-        formatterClass.sendMail(
-                mailSender,
-                templateEngine,
-                emailAddress,
-                customAppUrl);
+//        formatterClass.sendMail(
+//                mailSender,
+//                templateEngine,
+//                emailAddress,
+//                customAppUrl);
 
 
 
     }
+
 
     @Override
     public Results listSurveyRespondent(String surveyId) {
