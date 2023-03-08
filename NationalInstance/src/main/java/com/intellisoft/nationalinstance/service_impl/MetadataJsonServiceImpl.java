@@ -91,9 +91,12 @@ public class MetadataJsonServiceImpl implements MetadataJsonService{
         Optional<MetadataJson> optionalMetadataJson =
                 metadataJsonRepo.findById(id);
         if (optionalMetadataJson.isPresent()){
+
             MetadataJson metadataJsonUpdate = optionalMetadataJson.get();
+
             metadataJsonUpdate.setCode(metadataJson.getCode());
             metadataJsonUpdate.setMetadata(metadataJson.getMetadata());
+
             return metadataJsonRepo.save(metadataJsonUpdate);
         }
         metadataJson.setId(id);

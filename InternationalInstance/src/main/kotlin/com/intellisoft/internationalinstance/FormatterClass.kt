@@ -8,6 +8,19 @@ import java.util.regex.Pattern
 
 class FormatterClass {
 
+    fun getNextVersion(list:List<Any>):Int{
+
+        val intList = list.map { it.toString().toIntOrNull() }
+        val filteredList = intList.filterIsInstance<Int>()
+        val largestValue = filteredList.maxOrNull()
+
+        return if (largestValue != null){
+            largestValue + 1
+        }else{
+            1
+        }
+    }
+
     fun getIndicatorName(indicatorName: String): String{
 
         var name = ""

@@ -121,7 +121,7 @@ public class VersionServiceImpl implements VersionService {
             status = PublishStatus.PUBLISHED.name();
         }
 
-        String versionNo = "1";
+        String versionNo = String.valueOf(getInternationalVersions());
 
         //Generate versions
         if (dbVersionData.getVersionId() != null){
@@ -138,17 +138,9 @@ public class VersionServiceImpl implements VersionService {
             }
 
 
-        }else {
-            //Generate new version name
-            Long currentId = versionRepos.findLatestId();
-            if (currentId != null){
-                long nextId = versionRepos.findLatestId() + 1;
-                versionNo = String.valueOf(nextId);
-            }
-
         }
 
-        String versionNumber = "vv"+versionNo;
+        String versionNumber = versionNo;
         //Set the version number
         version.setVersionName(versionNumber);
         version.setIndicators(indicatorList);
@@ -242,6 +234,20 @@ public class VersionServiceImpl implements VersionService {
         }
 
         return versionRepos.save(version);
+    }
+
+    private int getInternationalVersions() throws URISyntaxException {
+
+        var response = GenericWebclient.getForSingleObjResponse(
+                AppConstants.DATA_STORE_ENDPOINT,
+                List.class);
+
+        if (!response.isEmpty()){
+            return formatterClass.getNextVersion(response);
+        }else {
+            return 1;
+        }
+
     }
 
     @Override

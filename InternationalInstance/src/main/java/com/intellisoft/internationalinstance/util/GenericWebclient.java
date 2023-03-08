@@ -103,7 +103,10 @@ public class GenericWebclient {
      * @throws URISyntaxException
      */
     @SafeVarargs
-    public  static<V, E extends Exception> Flux<V> getForCollectionResponse(String url, Class<V> responseClass, E... exceptions) throws URISyntaxException {
+    public  static<V, E extends Exception> Flux<V> getForCollectionResponse(
+            String url,
+            Class<V> responseClass,
+            E... exceptions) throws URISyntaxException {
         return myWebClient().get()
                 .uri(new URI(url))
                 .retrieve()

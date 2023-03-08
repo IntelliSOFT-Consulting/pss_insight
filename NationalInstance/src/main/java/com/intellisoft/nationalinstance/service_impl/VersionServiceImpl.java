@@ -33,6 +33,7 @@ public class VersionServiceImpl implements VersionService {
     private final VersionRepos versionRepos;
     private final FormatterClass formatterClass = new FormatterClass();
     private final MetadataJsonService metadataJsonService;
+    private final IndicatorDescriptionService indicatorDescriptionService;
 
 //    @Override
 //    public List<IndicatorForFrontEnd> getIndicators() throws URISyntaxException {
@@ -77,7 +78,7 @@ public class VersionServiceImpl implements VersionService {
             status = PublishStatus.PUBLISHED.name();
         }
 
-        String versionNo = "1";
+        String versionNo = String.valueOf(getInternationalVersions());
 
         //Generate versions
         if (dbVersionData.getVersionId() != null){
@@ -94,17 +95,9 @@ public class VersionServiceImpl implements VersionService {
             }
 
 
-        }else {
-            //Generate new version name
-            Long currentId = versionRepos.findLatestId();
-            if (currentId != null){
-                long nextId = versionRepos.findLatestId() + 1;
-                versionNo = String.valueOf(nextId);
-            }
-
         }
 
-        String versionNumber = "vv"+versionNo;
+        String versionNumber = versionNo;
         //Set the version number
         version.setVersionName(versionNumber);
         version.setIndicators(indicatorList);
@@ -198,6 +191,20 @@ public class VersionServiceImpl implements VersionService {
         }
 
         return versionRepos.save(version);
+
+    }
+
+    private int getInternationalVersions() throws URISyntaxException {
+
+        var response = GenericWebclient.getForSingleObjResponse(
+                AppConstants.DATA_STORE_ENDPOINT,
+                List.class);
+
+        if (!response.isEmpty()){
+            return formatterClass.getNextVersion(response);
+        }else {
+            return 1;
+        }
 
     }
 
@@ -311,6 +318,7 @@ public class VersionServiceImpl implements VersionService {
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         try{
+            indicatorDescriptionService.getIndicatorDescription();
             metadataJsonService.getMetadataData();
             getDataFromRemote();
             List<Indicators> indicators = indicatorsRepo.findAll();
@@ -398,6 +406,7 @@ public class VersionServiceImpl implements VersionService {
         }
 
         DbFrontendIndicators dbFrontendIndicators = new DbFrontendIndicators(
+                name,
                 indicatorId,
                 categoryName,
                 indicatorName,
@@ -437,7 +446,7 @@ public class VersionServiceImpl implements VersionService {
 
     }
 
-    private List<Indicators> getDataFromRemote() throws URISyntaxException {
+    private void getDataFromRemote() throws URISyntaxException {
 
         List<Indicators> indicators = new LinkedList<>();
 
@@ -445,24 +454,36 @@ public class VersionServiceImpl implements VersionService {
                 AppConstants.METADATA_ENDPOINT, String.class);
 
         JSONObject jsObject = new JSONObject(res);
-//        JSONArray dataElements = jsObject.getJSONArray("dataElements");
         JSONArray dataElements = jsObject.getJSONArray("dataElementGroups");
         dataElements.forEach(element->{
-            String  id = ((JSONObject)element).getString("id");
+            String  indicatorId = ((JSONObject)element).getString("id");
 
             Indicators indicator = new Indicators();
-            indicator.setIndicatorId(id);
+            indicator.setIndicatorId(indicatorId);
             indicator.setMetadata(element.toString());
+            indicators.add(indicator);
 
-            boolean isIndicator = indicatorsRepo.existsByIndicatorId(id);
-            if (!isIndicator){
-                indicators.add(indicator);
-            }
 
         });
 
+        for (int i = 0; i < indicators.size(); i++){
 
-        return Lists.newArrayList(indicatorsRepo.saveAll(indicators));
+            String indicatorId = indicators.get(i).getIndicatorId();
+            String metadata = indicators.get(i).getMetadata();
+            Indicators indicatorsData = new Indicators();
+            indicatorsData.setIndicatorId(indicatorId);
+            indicatorsData.setMetadata(metadata);
+
+            Optional<Indicators> optionalIndicators = indicatorsRepo.findByIndicatorId(indicatorId);
+            if (optionalIndicators.isPresent()){
+                Indicators updateIndicator = optionalIndicators.get();
+                updateIndicator.setMetadata(metadata);
+                indicatorsRepo.save(updateIndicator);
+            }else {
+                indicatorsRepo.save(indicatorsData);
+            }
+
+        }
 
     }
     private JSONObject getRawRemoteData() throws URISyntaxException {
