@@ -122,7 +122,7 @@ enum class PublishStatus {
 data class DbIndicatorValues(
     val versionName:String,
     val versionDescription:String,
-    val versionId: Long,
+    val versionId: String,
     val status: String,
     val indicators: Any, )
 data class DbDataEntryData(

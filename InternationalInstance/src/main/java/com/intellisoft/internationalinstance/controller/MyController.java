@@ -7,6 +7,7 @@ import com.intellisoft.internationalinstance.db.VersionEntity;
 import com.intellisoft.internationalinstance.model.IndicatorForFrontEnd;
 import com.intellisoft.internationalinstance.service_impl.VersionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +52,7 @@ public class MyController {
     @PutMapping(value = "/version/{versionId}")
     public VersionEntity updateVersions(
             @RequestBody DbVersionData dbVersionData,
-            @PathVariable("versionId") Long versionId)throws URISyntaxException{
+            @Param("versionId") Long versionId)throws URISyntaxException{
 
         dbVersionData.setVersionId(versionId);
         return versionService.saveDraftOrPublish(dbVersionData);

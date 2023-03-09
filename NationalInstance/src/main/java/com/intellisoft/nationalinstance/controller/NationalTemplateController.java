@@ -59,7 +59,7 @@ public class NationalTemplateController {
      * Get Version Details
      */
     @GetMapping(value = "/version/{versionId}")
-    public ResponseEntity<?> getVersionDetails(@PathVariable("versionId") Long versionId){
+    public ResponseEntity<?> getVersionDetails(@PathVariable("versionId") String versionId){
         Results results = versionService.getVersion(versionId);
         return formatterClass.getResponse(results);
 
