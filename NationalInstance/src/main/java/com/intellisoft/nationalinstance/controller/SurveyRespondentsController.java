@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping(value = "/api/v1/survey-respondents")
@@ -20,9 +22,10 @@ public class SurveyRespondentsController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addSurveyRespondent(
-            @RequestBody DbSurveyRespondent dbSurveyRespondent){
+            @RequestBody DbSurveyRespondent dbSurveyRespondent) throws UnknownHostException {
         Results results = surveyRespondentsService
                 .addSurveyRespondent(dbSurveyRespondent);
+
         return formatterClass.getResponse(results);
     }
 

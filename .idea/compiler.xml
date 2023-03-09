@@ -7,14 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="MailServer" />
+        <module name="FileService" />
         <module name="NationalInstance" />
         <module name="InternationalInstance" />
-        <module name="FileService" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="FileService" target="11" />
       <module name="InternationalInstance" target="11" />
+      <module name="MailServer" target="11" />
       <module name="NationalInstance" target="11" />
     </bytecodeTargetLevel>
   </component>
@@ -22,6 +24,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="FileService" options="-parameters" />
       <module name="InternationalInstance" options="-parameters" />
+      <module name="MailServer" options="-parameters" />
       <module name="NationalInstance" options="-parameters" />
     </option>
   </component>

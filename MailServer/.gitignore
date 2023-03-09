@@ -31,7 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-
-## Passwords ##
-.env
 sendgrid.env
