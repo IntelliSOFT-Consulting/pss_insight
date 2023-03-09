@@ -11,6 +11,8 @@ import com.intellisoft.nationalinstance.db.repso.RespondentAnswersRepo;
 import com.intellisoft.nationalinstance.db.repso.SurveyResendRequestsRepo;
 import com.intellisoft.nationalinstance.db.repso.SurveyRespondentsRepo;
 import com.intellisoft.nationalinstance.util.EmailService;
+//import com.intellisoft.nationalinstance.util.MailService;
+import com.intellisoft.nationalinstance.util.MailService;
 import kotlin.Triple;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
@@ -20,6 +22,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -35,6 +38,8 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
     private final RespondentAnswersRepo respondentAnswersRepo;
     private final SurveyResendRequestsRepo surveyResendRequestsRepo;
     private final VersionServiceImpl versionService;
+
+    private final MailService mailService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -92,11 +97,13 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             respondentsRepo.save(surveyRespondents);
         }
 
-//        formatterClass.sendMail(
-//                mailSender,
-//                templateEngine,
-//                emailAddress,
-//                customAppUrl);
+
+
+        formatterClass.sendMail(
+                mailSender,
+                templateEngine,
+                emailAddress,
+                customAppUrl);
 
 
 
