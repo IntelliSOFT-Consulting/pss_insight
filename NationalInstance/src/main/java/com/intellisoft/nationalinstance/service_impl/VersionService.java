@@ -18,7 +18,7 @@ public interface VersionService {
       Results getTemplates(int page, int size, String status);
 
       Results deleteTemplate(long deleteId);
-      Results getVersion(long versionId);
+      Results getVersion(String versionId);
 
       Response syncVersion() throws URISyntaxException;
       List<IndicatorForFrontEnd> extractIndicators(List<Indicators> indicators);

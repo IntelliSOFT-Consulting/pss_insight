@@ -248,11 +248,11 @@ public class VersionServiceImpl implements VersionService {
     }
 
     @Override
-    public Results getVersion(long versionId) {
+    public Results getVersion(String versionId) {
         Results results;
 
         Optional<VersionEntity> optionalVersionEntity =
-                versionRepos.findById(versionId);
+                versionRepos.findById(Long.valueOf(versionId));
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         if (optionalVersionEntity.isPresent()){
