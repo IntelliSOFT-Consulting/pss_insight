@@ -1,6 +1,5 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.intellisoft.nationalinstance.*;
 import com.intellisoft.nationalinstance.db.RespondentAnswers;
 import com.intellisoft.nationalinstance.db.SurveyResendRequests;
@@ -10,19 +9,23 @@ import com.intellisoft.nationalinstance.db.repso.IndicatorsRepo;
 import com.intellisoft.nationalinstance.db.repso.RespondentAnswersRepo;
 import com.intellisoft.nationalinstance.db.repso.SurveyResendRequestsRepo;
 import com.intellisoft.nationalinstance.db.repso.SurveyRespondentsRepo;
+import com.intellisoft.nationalinstance.exception.CustomException;
+import com.intellisoft.nationalinstance.model.Response;
+import com.intellisoft.nationalinstance.util.AppConstants;
 import com.intellisoft.nationalinstance.util.EmailService;
 //import com.intellisoft.nationalinstance.util.MailService;
-import com.intellisoft.nationalinstance.util.MailService;
+import com.intellisoft.nationalinstance.util.GenericWebclient;
 import kotlin.Triple;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 
-import java.io.IOException;
+import java.net.InetAddress;
 import java.util.*;
 
 
@@ -38,16 +41,11 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
     private final RespondentAnswersRepo respondentAnswersRepo;
     private final SurveyResendRequestsRepo surveyResendRequestsRepo;
     private final VersionServiceImpl versionService;
-
-    private final MailService mailService;
-
     @Autowired
     private JavaMailSender mailSender;
 
     @Autowired
     public TemplateEngine templateEngine;
-
-    private final EmailService emailService;
 
 
     @Override
@@ -97,17 +95,42 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             respondentsRepo.save(surveyRespondents);
         }
 
-
-
-        formatterClass.sendMail(
-                mailSender,
-                templateEngine,
-                emailAddress,
-                customAppUrl);
-
+        List<DbSurveyRespondentData> dbSurveyRespondentDataList = new ArrayList<>();
+        DbSurveyRespondentData dbSurveyRespondentData = new DbSurveyRespondentData(emailAddress, expiryDateTime, customAppUrl, password);
+        dbSurveyRespondentDataList.add(dbSurveyRespondentData);
+        DbRespondents dbRespondents = new DbRespondents(dbSurveyRespondentDataList);
+        sendBackgroundEmail(dbRespondents);
 
 
     }
+    @Async
+    void sendBackgroundEmail(DbRespondents dbRespondents){
+
+        try{
+            String hostname = InetAddress.getLocalHost().getHostAddress();
+            System.out.println("===1"+hostname);
+
+            String mailServerUrl = "http://"+hostname+":7007/"+"api/v1/mail-service/send-email";
+            System.out.println("===2"+mailServerUrl);
+
+            var response = GenericWebclient.postForSingleObjResponse(
+                    mailServerUrl,
+                    dbRespondents,
+                    DbRespondents.class,
+                    Response.class);
+            System.out.println("RESPONSE FROM REMOTE: {}"+response);
+            if (response.getHttpStatusCode() < 200) {
+                System.out.println(response);
+            }
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
+
 
 
     @Override

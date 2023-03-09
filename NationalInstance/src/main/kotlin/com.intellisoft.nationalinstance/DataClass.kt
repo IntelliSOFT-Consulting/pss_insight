@@ -196,3 +196,12 @@ data class DbRespondentDetails(
     val emailAddress : String,
     val date: String
 )
+data class DbRespondents(
+    val respondents: List<DbSurveyRespondentData>
+)
+data class DbSurveyRespondentData(
+    val emailAddress:String,
+    val expiryDate:String,
+    val customUrl: String,
+    val password:String
+)

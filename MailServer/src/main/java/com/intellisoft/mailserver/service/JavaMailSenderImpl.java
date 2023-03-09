@@ -2,6 +2,9 @@ package com.intellisoft.mailserver.service;
 
 import com.intellisoft.mailserver.*;
 import com.sendgrid.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -13,14 +16,19 @@ import java.util.List;
 @Service
 public class JavaMailSenderImpl implements JavaMailSender{
 
+    @Value("${SENDGRID_API_KEY}")
+    private String sendGridApi;
+
     private final FormatterClass formatterClass = new FormatterClass();
 
     @Async
     void sendEmailBackground(List<DbSurveyRespondent> surveyRespondentList) throws IOException {
 
-        Email from = new Email("dnjau@intellisoftkenya.com");
+        System.out.println(sendGridApi);
+
+        Email from = new Email("pssnotifications23@gmail.com");
         String subject = "PSS Survey";
-        SendGrid sg = new SendGrid("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");
+        SendGrid sg = new SendGrid(sendGridApi);
         Request request = new Request();
 
         // Read the email template from the resources folder

@@ -35,44 +35,19 @@ class FormatterClass {
         }
     }
 
-    fun sendMail(emailSender: JavaMailSender,
-                 templateEngine: TemplateEngine,
-                 emailAddress: String,
+    fun sendMail(emailAddress: String,
                  customUrl: String){
 
         CoroutineScope(Dispatchers.IO).launch {
-            sendSurveyLink(emailSender,emailAddress, customUrl,templateEngine)
+            sendSurveyLink(emailAddress, customUrl)
         }
     }
     private suspend fun sendSurveyLink(
-        emailSender: JavaMailSender,
         emailAddress: String,
-        customUrl: String,
-        templateEngine: TemplateEngine){
+        customUrl: String){
         coroutineScope {
             launch(Dispatchers.IO){
 
-
-
-                val subject = "PSS Survey"
-                val greeting = "Dear $emailAddress, "
-                val action = customUrl
-                val message = "Use this to verify your email address in 5 minutes.\n\n$action \n\n " +
-                        "If you did not initiate this process please ignore the message"
-
-                val context = Context()
-                context.setVariable("subject", subject)
-                context.setVariable("greeting", greeting)
-                context.setVariable("message", message)
-                context.setVariable("action", "")
-
-                val process: String = templateEngine.process("notifications", context)
-                val mimeMessage: MimeMessage = emailSender.createMimeMessage()
-                val helper = MimeMessageHelper(mimeMessage)
-                helper.setSubject(subject)
-                helper.setText(process, true)
-                helper.setTo(emailAddress)
-                emailSender.send(mimeMessage)
 
             }
         }
