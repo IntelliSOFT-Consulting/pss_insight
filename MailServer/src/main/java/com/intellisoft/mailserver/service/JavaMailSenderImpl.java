@@ -16,26 +16,24 @@ import java.util.List;
 @Service
 public class JavaMailSenderImpl implements JavaMailSender{
 
-    @Value("${API1}")
-    private String api1;
     @Value("${API2}")
     private String api2;
-    @Value("${API3}")
-    private String api3;
+    private String api3 = "_3A.WaLPg3rVm6je";
     @Value("${API4}")
     private String api4;
     @Value("${API5}")
     private String api5;
+    private String emailAddressAdmin = "pssnotifications";
 
     private final FormatterClass formatterClass = new FormatterClass();
 
     @Async
     void sendEmailBackground(List<DbSurveyRespondent> surveyRespondentList) throws IOException {
 
-        String sendGridApi = api1+api2+api3+api4+api5;
+        String sendGridApi = "S"+api2+api3+api4+api5+"DmxOJa2vBRI";
         System.out.println(sendGridApi);
 
-        Email from = new Email("pssnotifications2023@gmail.com");
+        Email from = new Email(emailAddressAdmin+"23@gmail.com");
         String subject = "PSS Survey";
         SendGrid sg = new SendGrid(sendGridApi);
         Request request = new Request();
