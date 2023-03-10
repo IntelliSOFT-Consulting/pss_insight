@@ -86,17 +86,21 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
 
         Optional<SurveyRespondents> optionalSurveyRespondents =
                 respondentsRepo.findByEmailAddressAndSurveyId(emailAddress, surveyId);
+
         if (optionalSurveyRespondents.isPresent()){
             SurveyRespondents surveyDbRespondents = optionalSurveyRespondents.get();
             surveyDbRespondents.setPassword(password);
             surveyDbRespondents.setExpiryTime(expiryDateTime);
-            respondentsRepo.save(surveyDbRespondents);
+            surveyRespondents = respondentsRepo.save(surveyDbRespondents);
         }else {
-            respondentsRepo.save(surveyRespondents);
+            surveyRespondents = respondentsRepo.save(surveyRespondents);
         }
 
+        Long respondentId = surveyRespondents.getId();
+        String loginUrl = customAppUrl + "?id="+respondentId;
+
         List<DbSurveyRespondentData> dbSurveyRespondentDataList = new ArrayList<>();
-        DbSurveyRespondentData dbSurveyRespondentData = new DbSurveyRespondentData(emailAddress, expiryDateTime, customAppUrl, password);
+        DbSurveyRespondentData dbSurveyRespondentData = new DbSurveyRespondentData(emailAddress, expiryDateTime, loginUrl, password);
         dbSurveyRespondentDataList.add(dbSurveyRespondentData);
         DbRespondents dbRespondents = new DbRespondents(dbSurveyRespondentDataList);
         sendBackgroundEmail(dbRespondents);
