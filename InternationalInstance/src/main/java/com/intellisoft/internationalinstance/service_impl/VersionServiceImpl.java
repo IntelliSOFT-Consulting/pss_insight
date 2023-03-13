@@ -1,6 +1,5 @@
 package com.intellisoft.internationalinstance.service_impl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.intellisoft.internationalinstance.*;
 import com.intellisoft.internationalinstance.db.Indicators;
@@ -9,13 +8,11 @@ import com.intellisoft.internationalinstance.db.VersionEntity;
 import com.intellisoft.internationalinstance.db.repso.IndicatorsRepo;
 import com.intellisoft.internationalinstance.db.repso.VersionRepos;
 import com.intellisoft.internationalinstance.exception.CustomException;
-import com.intellisoft.internationalinstance.model.IndicatorForFrontEnd;
 import com.intellisoft.internationalinstance.model.Response;
 import com.intellisoft.internationalinstance.util.AppConstants;
 import com.intellisoft.internationalinstance.util.GenericWebclient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import netscape.javascript.JSObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,12 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -58,12 +53,6 @@ public class VersionServiceImpl implements VersionService {
                 try {
                     getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
 
-//                    String code = jsonObject.getString("code");
-//                    String formName = jsonObject.getString("formName");
-//                    if (!formName.equals("Comments") && !formName.equals("Uploads")){
-//                        indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
-//
-//                    }
                 } catch (JSONException e) {
                     System.out.println("*****1");
                     log.info(e.getMessage());
@@ -203,8 +192,13 @@ public class VersionServiceImpl implements VersionService {
                     });
 
                 }
-
-                jsonObjectMetadataJson.put("dataElements", new JSONArray(dataElementsArray));
+                JSONObject groups = GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_GROUPINGS, JSONObject.class);
+                JSONObject indicatorDescriptions = GenericWebclient.getForSingleObjResponse(AppConstants.INDICATOR_DESCRIPTIONS, JSONObject.class);
+                JSONObject metaDataJson = jsonObjectMetadataJson.getJSONObject("metadata");
+                metaDataJson.put("dataElements",dataElementsArray);
+                metaDataJson.put("groups",groups);
+                metaDataJson.put("indicatorDescriptions",indicatorDescriptions);
+                jsonObjectMetadataJson.put("metadata",  metaDataJson);
                 jsonObjectMetadataJson.put("version", versionNumber);
                 jsonObjectMetadataJson.put("versionDescription", versionDescription);
 
@@ -218,7 +212,6 @@ public class VersionServiceImpl implements VersionService {
                 if (response.getHttpStatusCode() < 200) {
                     throw new CustomException("Unable to create/update record on data store"+response);
                 }else {
-//                    versionRepos.updateAllIsPublishedToFalse(PublishStatus.DRAFT.name());
 
                     version.setStatus(PublishStatus.PUBLISHED.name());
                     if (publishedBy != null){
@@ -253,13 +246,6 @@ public class VersionServiceImpl implements VersionService {
     @Override
     public Results getTemplates(int page, int size, String status) {
 
-//        List<VersionEntity> versionEntityList =
-//                getPagedTemplates(
-//                        page,
-//                        size,
-//                        "",
-//                        "",
-//                        status);
 
         List<VersionEntity> versionEntityList = (List<VersionEntity>) versionRepos.findAll();
 
@@ -424,7 +410,7 @@ public class VersionServiceImpl implements VersionService {
         List<Indicators> indicators = new LinkedList<>();
 
         var  res =GenericWebclient.getForSingleObjResponse(
-                AppConstants.METADATA_ENDPOINT, String.class);
+                AppConstants.METADATA_GROUPINGS, String.class);
 
         JSONObject jsObject = new JSONObject(res);
 //        JSONArray dataElements = jsObject.getJSONArray("dataElements");
@@ -451,7 +437,7 @@ public class VersionServiceImpl implements VersionService {
 
 
     private JSONObject getRawRemoteData() throws URISyntaxException {
-        var  res =GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_ENDPOINT, String.class);
+        var  res =GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_JSON_ENDPOINT, String.class);
         return new  JSONObject(res);
     }
 }

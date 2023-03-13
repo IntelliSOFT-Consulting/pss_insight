@@ -25,9 +25,8 @@ public class MetadataJsonServiceImpl implements MetadataJsonService{
     public void getMetadataData() throws URISyntaxException {
 
         List<MetadataJson> metadataJsonList = new ArrayList<>();
-        var  res = GenericWebclient.getForSingleObjResponse(
-                AppConstants.METADATA_JSON_ENDPOINT, String.class);
-        JSONObject jsObject = new JSONObject(res);
+        var  jsObject = GenericWebclient.getForSingleObjResponse(
+                AppConstants.METADATA_JSON_ENDPOINT, JSONObject.class);
         JSONArray dataElements = jsObject.getJSONArray("dataElements");
         dataElements.forEach(element -> {
 

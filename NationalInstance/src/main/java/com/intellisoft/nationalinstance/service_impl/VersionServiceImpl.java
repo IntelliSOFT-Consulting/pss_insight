@@ -1,6 +1,5 @@
 package com.intellisoft.nationalinstance.service_impl;
 
-import com.google.common.collect.Lists;
 import com.intellisoft.nationalinstance.*;
 import com.intellisoft.nationalinstance.DbVersionData;
 import com.intellisoft.nationalinstance.PublishStatus;
@@ -78,7 +77,7 @@ public class VersionServiceImpl implements VersionService {
             status = PublishStatus.PUBLISHED.name();
         }
 
-        String versionNo = String.valueOf(getInternationalVersions());
+        String versionNo = String.valueOf(getVersions(AppConstants.DATA_STORE_ENDPOINT)+1);
 
         //Generate versions
         if (dbVersionData.getVersionId() != null){
@@ -194,10 +193,10 @@ public class VersionServiceImpl implements VersionService {
 
     }
 
-    private int getInternationalVersions() throws URISyntaxException {
+    private int getVersions(String url) throws URISyntaxException {
 
         var response = GenericWebclient.getForSingleObjResponse(
-                AppConstants.DATA_STORE_ENDPOINT,
+                url,
                 List.class);
 
         if (!response.isEmpty()){
@@ -312,15 +311,24 @@ public class VersionServiceImpl implements VersionService {
 
     @Override
     public Results getIndicators() throws URISyntaxException {
+//Get versionNumber
+        String versionNo = String.valueOf(getVersions(AppConstants.DATA_STORE_ENDPOINT_INT));
+        var metadataObject = GenericWebclient.getForSingleObjResponse(AppConstants.DATA_STORE_ENDPOINT_INT+"/"+versionNo, JSONObject.class);
 
+//get indicatorDescription object save using addIndicatorDescription in indicatorService
+        //get metadata dataelements and save using saveMetadataJson metadATaJsonService
+        //get metadata groups and save using getMetadataFromRemote in this same class
+        //create a method to : will return json object
+        //get versionNo for national
+        //get metadata object for national passing the nationalVersion No
+        //get groups from national
 
-//        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
         try{
-            indicatorDescriptionService.getIndicatorDescription();
-            metadataJsonService.getMetadataData();
-            getDataFromRemote();
+//            indicatorDescriptionService.getIndicatorDescription();
+//            metadataJsonService.getMetadataData();
+//            getDataFromRemote();
             List<Indicators> indicators = indicatorsRepo.findAll();
 
             indicators.forEach(indicator -> {
@@ -328,12 +336,6 @@ public class VersionServiceImpl implements VersionService {
                 try {
                     getIndicatorGroupings(indicatorForFrontEnds, jsonObject);
 
-//                    String code = jsonObject.getString("code");
-//                    String formName = jsonObject.getString("formName");
-//                    if (!formName.equals("Comments") && !formName.equals("Uploads")){
-//                        indicatorForFrontEnds.add(new IndicatorForFrontEnd(id, code, formName));
-//
-//                    }
                 } catch (JSONException e) {
                     System.out.println("*****1");
                     log.info(e.getMessage());
@@ -450,10 +452,9 @@ public class VersionServiceImpl implements VersionService {
 
         List<Indicators> indicators = new LinkedList<>();
 
-        var  res = GenericWebclient.getForSingleObjResponse(
-                AppConstants.METADATA_ENDPOINT, String.class);
+        var  jsObject = GenericWebclient.getForSingleObjResponse(
+                AppConstants.METADATA_GROUPINGS, JSONObject.class);
 
-        JSONObject jsObject = new JSONObject(res);
         JSONArray dataElements = jsObject.getJSONArray("dataElementGroups");
         dataElements.forEach(element->{
             String  indicatorId = ((JSONObject)element).getString("id");
