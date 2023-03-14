@@ -114,7 +114,8 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
             String hostname = InetAddress.getLocalHost().getHostAddress();
             System.out.println("===1"+hostname);
 
-            String mailServerUrl = "http://"+hostname+":7007/"+"api/v1/mail-service/send-email";
+//            String mailServerUrl = "http://"+hostname+":7007/"+"api/v1/mail-service/send-email";
+            String mailServerUrl = "http://"+"172.104.91.99"+":7007/"+"api/v1/mail-service/send-email";
             System.out.println("===2"+mailServerUrl);
 
             var response = GenericWebclient.postForSingleObjResponse(
@@ -332,7 +333,7 @@ public class SurveyRespondentsServiceImpl implements SurveyRespondentsService{
         DbResults dbResults = new DbResults(
                 categoryIndicatorsAnswersList.size(),
                 categoryIndicatorsAnswersList);
-        return new Results(200, categoryIndicatorsAnswersList);
+        return new Results(200, dbResults);
 
 
     }
