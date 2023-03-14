@@ -41,21 +41,25 @@ public class MyController {
      * @throws URISyntaxException
      */
     @PostMapping("/version")
-    public VersionEntity createVersion(
+    public ResponseEntity<?> createVersion(
             @RequestBody DbVersionData dbVersionData) throws URISyntaxException {
-        return versionService.saveDraftOrPublish(dbVersionData);
+        Results results = versionService.saveDraftOrPublish(dbVersionData);
+        return formatterClass.getResponse(results);
     }
 
     /**
      * Update either local or data store
      */
     @PutMapping(value = "/version/{versionId}")
-    public VersionEntity updateVersions(
+    public ResponseEntity<?> updateVersions(
             @RequestBody DbVersionData dbVersionData,
             @Param("versionId") Long versionId)throws URISyntaxException{
 
         dbVersionData.setVersionId(versionId);
-        return versionService.saveDraftOrPublish(dbVersionData);
+
+        Results results = versionService.saveDraftOrPublish(dbVersionData);
+        return formatterClass.getResponse(results);
+
 
     }
 

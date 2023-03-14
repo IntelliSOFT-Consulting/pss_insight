@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.net.URISyntaxException;
 import java.util.*;
@@ -94,8 +95,9 @@ public class VersionServiceImpl implements VersionService {
     }
 
     @Override
-    public VersionEntity saveDraftOrPublish(DbVersionData dbVersionData) throws URISyntaxException {
+    public Results saveDraftOrPublish(DbVersionData dbVersionData) throws URISyntaxException {
 
+        Results results;
         VersionEntity version = new VersionEntity();
 
         String versionDescription = dbVersionData.getVersionDescription();
@@ -192,25 +194,35 @@ public class VersionServiceImpl implements VersionService {
                     });
 
                 }
-                JSONObject groups = GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_GROUPINGS, JSONObject.class);
-                JSONObject indicatorDescriptions = GenericWebclient.getForSingleObjResponse(AppConstants.INDICATOR_DESCRIPTIONS, JSONObject.class);
-                JSONObject metaDataJson = jsonObjectMetadataJson.getJSONObject("metadata");
-                metaDataJson.put("dataElements",dataElementsArray);
-                metaDataJson.put("groups",groups);
-                metaDataJson.put("indicatorDescriptions",indicatorDescriptions);
-                jsonObjectMetadataJson.put("metadata",  metaDataJson);
-                jsonObjectMetadataJson.put("version", versionNumber);
-                jsonObjectMetadataJson.put("versionDescription", versionDescription);
+
+                var groups = GenericWebclient.getForSingleObjResponse(AppConstants.METADATA_GROUPINGS, String.class);
+                var indicatorDescriptions = GenericWebclient.getForSingleObjResponse(AppConstants.INDICATOR_DESCRIPTIONS, String.class);
+                JSONArray jsonArray = new JSONArray(indicatorDescriptions);
+                JSONObject jsonObjectGroups = new JSONObject(groups);
+
+                JSONObject jsonObject = new JSONObject();
+
+                jsonObjectMetadataJson.remove("dataElements");
+
+                jsonObjectMetadataJson.put("dataElements",dataElementsArray);
+
+                jsonObjectMetadataJson.put("groups",jsonObjectGroups);
+                jsonObjectMetadataJson.put("indicatorDescriptions",jsonArray);
+
+                jsonObject.put("metadata",  jsonObjectMetadataJson);
+                jsonObject.put("version", versionNumber);
+                jsonObject.put("versionDescription", versionDescription);
 
 
                 var response = GenericWebclient.postForSingleObjResponse(
-                        AppConstants.DATA_STORE_ENDPOINT+versionNumber,
-                        jsonObjectMetadataJson,
+                        AppConstants.DATA_STORE_ENDPOINT+Integer.parseInt(versionNumber),
+                        jsonObject,
                         JSONObject.class,
                         Response.class);
                 log.info("RESPONSE FROM REMOTE: {}",response.toString());
                 if (response.getHttpStatusCode() < 200) {
-                    throw new CustomException("Unable to create/update record on data store"+response);
+                    results=new Results(400, "Unable to create/update record on data store"+response);
+
                 }else {
 
                     version.setStatus(PublishStatus.PUBLISHED.name());
@@ -220,13 +232,15 @@ public class VersionServiceImpl implements VersionService {
                 }
 
             }else {
-                throw new CustomException("No indicators found for the ids given"+indicatorList);
+                results=new Results(400, "No indicators found for the ids given"+indicatorList);
             }
 
 
         }
 
-        return versionRepos.save(version);
+//        versionRepos.save(version);
+
+        return new Results(201, versionRepos.save(version));
     }
 
     private int getInternationalVersions() throws URISyntaxException {
