@@ -314,6 +314,7 @@ public class VersionServiceImpl implements VersionService {
     public Results getIndicators() throws URISyntaxException {
 
 
+
 //        List<IndicatorForFrontEnd> indicatorForFrontEnds = new LinkedList<>();
         List<DbFrontendIndicators> indicatorForFrontEnds = new LinkedList<>();
 
